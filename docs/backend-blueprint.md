@@ -190,16 +190,39 @@ Per-tool endpoints (paths follow the observed `/api/tools/<tool>/<action>` conve
 ### 5.3 Priority
 `priority_queue` plan flag → BullMQ priority on the job **[PROPOSED]**. Free jobs deprioritized behind paid — matches the "Priority queue" feature line on paid plans **[OBSERVED]**.
 
-### 5.4 Provider abstraction
+### 5.4 Provider architecture: routed, multi-provider (no fixed provider per tool)
+
+**[DECIDED 2026-09-30, vaibhav]**: providers are **not** fixed per module. The backend keeps a provider registry; each capability resolves to an ordered provider chain at request time.
+
+**Capabilities:** `tts` · `video` · `image` · `llm` (prompt refinement, breakdowns, SEO/niche text, AI chat).
+
+**Registry (initial):**
+
+| Provider | Capabilities | Notes |
+|---|---|---|
+| ElevenLabs | tts, sfx, sts, voice-design, voice-clone | primary TTS; 580+ voice catalog |
+| Gemini | llm, image, video, tts | Google models incl. Veo-class video ("Google Flow VEO" label seen in UI **[OBSERVED]**) |
+| LTX(-Video) | video | open-source, via API |
+| Hunyuan | video, image | open-source, via API |
+| Qwen | llm, image | open-source, via API |
+| … | … | registry is append-only; new providers need no code changes beyond an adapter |
+
+**[PROPOSED]** mechanics:
 ```ts
-interface MediaProvider {
-  generateVideo(params): Promise<ProviderJob>;
-  generateImage(params): Promise<Artifact>;
-  synthesizeSpeech(params): Promise<Artifact>;
+interface CapabilityProvider {
+  capability: 'tts'|'video'|'image'|'llm';
+  name: string;                       // 'elevenlabs' | 'gemini' | 'ltx' | …
+  generate(params, opts): Promise<ProviderJob | Artifact>;
   getJobStatus(id): Promise<{status, progress, result?}>;
 }
+// routing
+resolveProvider(capability, ctx: {plan, tool, userChoice?}): CapabilityProvider[]
 ```
-Concrete adapters (Google Flow VEO label seen in UI **[OBSERVED]**; ElevenLabs for TTS **[OBSERVED]**) plug in here. Workers never import a provider directly — only the interface **[PROPOSED]**. Which accounts/keys you hold decides which adapters we implement first (open question §8).
+- **Routing rules** (admin-configurable, stored in DB): per plan tier and/or per tool, e.g. Free → cheapest chain first (open-source), Premium → quality-first (Gemini/ElevenLabs). Where the UI offers a model picker (**[OBSERVED]** on video tools), `userChoice` pins the provider.
+- **Fallback**: if a provider errors or times out, the worker walks the chain — no failed job until the chain is exhausted.
+- **Cost metering**: every provider call logs `{provider, capability, units, cost_estimate}` → feeds margin visibility per plan and the dashboard's token cards.
+- **Keys**: provider API keys per environment (Vault); child-panel tenants can later bring their own keys.
+- Workers depend only on `resolveProvider()` + the interface — never on a vendor SDK directly.
 
 ---
 
@@ -239,7 +262,8 @@ Free plan (observed): 1 thread · 2-min max video · 1 scene/cycle · 100 TTS ch
 |---|---|---|
 | 1 | Auth transport: Bearer JWT in `Authorization` header vs httpOnly cookie? | **Bearer** — simplest for the static frontend + future mobile/API use; 15-min access + 7-day rotating refresh. |
 | 2 | "Day" boundary for quota reset: server midnight vs each user's timezone? | **Server midnight** for v1 (one code path); user-tz later. |
-| 3 | Which provider accounts do you actually hold — ElevenLabs? Which video model API? | **Adapter pattern** means we build the interface now; implement adapters for whichever keys you have. Tell me what exists. |
+| 3 | Which provider accounts do you actually hold — ElevenLabs? Which video model API? | **RESOLVED 2026-09-30 (vaibhav)**: ElevenLabs + Gemini + open-source via API (LTX, Hunyuan, Qwen, more) — **no fixed provider per module**. Blueprint §5.4 redesigned as a routed provider registry with per-plan/per-tool chains, fallback, and cost metering. |
+| 3b | Open-source models "with api" — which API transport? (fal.ai / Replicate / Together / self-hosted endpoint?) | **Defaults to fal.ai/Replicate-style adapter**; confirm which one(s) you use so R3 wires the right transport. |
 | 4 | Payment gateway now or later? (Site says "Contact to Upgrade" — manual.) | **Manual v1** as designed above; Razorpay when volume justifies it. |
 | 5 | Job progress: polling (proposed) vs WebSocket/SSE? | **Polling** v1 — matches the static pages, zero infra. |
 | 6 | Artifact storage: local disk v1 vs S3-compatible from day one? | **Local disk behind the storage interface** — migrate without code changes later. |
