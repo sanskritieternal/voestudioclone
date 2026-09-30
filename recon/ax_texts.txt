@@ -1,0 +1,657 @@
+
+===== dashboard =====
+# refs=80
+- button "Rate this Platform" @e6 dup=1/2
+- button "Ai Assistant" @e26
+- button "Quick actions" @e1
+- image "Logo" @e107
+- heading "VEO Studio Ai" @e3 [level=2]
+- button "Collapse sidebar" @e4
+- navigation @e2
+  · "MAIN"
+  - link "Dashboard" @e5
+  - link "Auto Pilot Video Gen" @e10
+  - link "Viral Niches Templates" @e11
+  - link "My Projects" @e12
+  - link "Prompting Rules" @e13
+  - link "My Jobs" @e14
+  · "VIDEO TOOLS"
+  - button "Video Editor" @e16 description="Open Video Editor (opens in a new tab)"
+  - button "Video Editor settings" @e17
+  - link "Long Videos Generator" @e18
+  - link "Bulk Videos Generator" @e19
+  - link "First & Last Frame" @e20 dup=1/2
+  - link "Bulk Images to Videos" @e21
+  - link "Lip Sync Videos Gen" @e22
+  - link "UGC Ads Creator" @e23
+  · "AUDIO TOOLS"
+  - link "Text to Speech" @e33 dup=1/2
+  - link "Multi Character Voice" @e60
+  - link "Voice History" @e61
+  · "IMAGE TOOLS"
+  - link "Image to Prompt" @e62
+  · "YOUTUBE AUTOMATION"
+  - link "Niche Finder" @e63
+  - link "SEO Generator" @e65
+  - link "Tags Generator" @e66
+  - link "Channel Analyzer" @e67
+  - link "Video Breakdown" @e68
+  - link "Master Prompt" @e69
+  - link "Search History" @e70
+  · "API KEY"
+  - link "API Keys" @e71
+  - link "API Docs" @e72
+  · "MY ACCOUNTS"
+  - link "My Accounts" @e75
+  · "UPGRADE PLAN"
+  - link "Plans" @e76
+  - link "Offers" @e77
+  - link "Billing & Payments" @e78
+  - link "Child Panel" @e79
+  · "EARN"
+  - link "Affiliate Program" @e80
+  · "SUPPORT & HELP"
+  - link "AI Chat" @e81
+  - link "Support Tickets" @e82
+  - link "Help Center" @e83
+  · "LEGAL & INFO"
+  - link "About Us" @e84
+  - link "Contact Us" @e85
+  - link "Terms & Conditions" @e86
+  - link "Privacy Policy" @e87
+  - link "Refund Policy" @e88
+- button "Dark Mode" @e89
+- link "M milan milanparmar9621@gmail.com" @e90
+- button "Logout" @e91
+- main @e92
+  - heading "Welcome back, milan" @e34 [level=1]
+  · "Here's your complete overview and analytics"
+  - button "Notifications" @e35
+  - button "EN" @e36
+  - link "New Project" @e37
+  · "Free Plan"
+  · "1threads·2min max·1scenes/cycle·Daily Reset"
+  - link "Upgrade" @e38
+  · "Total Projects"
+  · "Completed"
+  · "Processing"
+  · "Failed"
+  · "Scenes Generated"
+  · "0m"
+  · "Total Duration"
+  · "0/1"
+  · "Resets in23h 51m 8s"
+  · "Images"
+  · "0/10"
+  · "TTS Characters"
+  · "0/100"
+  · "Niche Analyses"
+  · "AI Usage"
+  - heading "AI Token Usage" @e39 [level=3]
+  · "23.9K"
+  · "Input Tokens"
+  · "5.4K"
+  · "Output Tokens"
+  · "29.4K"
+  · "Total Tokens"
+  - heading "Project Activity" @e40 [level=3]
+  · "Last 14 days"
+  - image "Completed legend icon" @e41
+  - image "Created legend icon" @e42
+  · "Sep 17"
+  · "Sep 19"
+  · "Sep 21"
+  · "Sep 23"
+  · "Sep 25"
+  · "Sep 27"
+  · "Sep 30"
+  - heading "Status Breakdown" @e43 [level=3]
+  · "No project data yet"
+  - heading "Login Activity" @e44 [level=3]
+  - image "Failed legend icon" @e45
+  - image "Logins legend icon" @e46
+  · "Sep 22"
+  · "Sep 26"
+  - heading "Project Types" @e47 [level=3]
+  - heading "Scenes Generated" @e48 [level=3]
+  - heading "Scenes Status" @e49 [level=3]
+  · "Total Scenes"
+  - heading "Quick Tools" @e50 [level=3]
+  - link "All tools" @e51
+  - link "Bulk Videos" @e52
+  - link "First & Last Frame" @e53 dup=2/2
+  - link "Text to Speech" @e54 dup=2/2
+  - link "Multi Voice TTS" @e55
+  - link "Images to Video" @e56
+  - heading "Recent Activity" @e57 [level=3]
+  · "Successful login"
+  · "Sep 28"
+  - heading "Recent Projects" @e58 [level=3]
+  - link "View all" @e59
+  · "No projects yet. Create your first one!"
+  - link "Create Project" @e64
+  - button "Rate this platform" @e27 dup=2/2
+
+===== profile =====
+# refs=62
+- button "Quick actions" @e1
+- image "Logo" @e107
+- heading "VEO Studio Ai" @e3 [level=2]
+- button "Collapse sidebar" @e4
+- navigation @e2
+  · "MAIN"
+  - link "Dashboard" @e5
+  - link "Auto Pilot Video Gen" @e10
+  - link "Viral Niches Templates" @e11
+  - link "My Projects" @e12
+  - link "Prompting Rules" @e13
+  - link "My Jobs" @e14
+  · "VIDEO TOOLS"
+  - button "Video Editor" @e16 description="Open Video Editor (opens in a new tab)"
+  - button "Video Editor settings" @e17
+  - link "Long Videos Generator" @e18
+  - link "Bulk Videos Generator" @e19
+  - link "First & Last Frame" @e6
+  - link "Bulk Images to Videos" @e21
+  - link "Lip Sync Videos Gen" @e22
+  - link "UGC Ads Creator" @e23
+  · "AUDIO TOOLS"
+  - link "Text to Speech" @e7
+  - link "Multi Character Voice" @e60
+  - link "Voice History" @e61
+  · "IMAGE TOOLS"
+  - link "Image to Prompt" @e62
+  · "YOUTUBE AUTOMATION"
+  - link "Niche Finder" @e63
+  - link "SEO Generator" @e65
+  - link "Tags Generator" @e66
+  - link "Channel Analyzer" @e67
+  - link "Video Breakdown" @e68
+  - link "Master Prompt" @e69
+  - link "Search History" @e70
+  · "API KEY"
+  - link "API Keys" @e71
+  - link "API Docs" @e72
+  · "MY ACCOUNTS"
+  - link "My Accounts" @e75
+  · "UPGRADE PLAN"
+  - link "Plans" @e76
+  - link "Offers" @e77
+  - link "Billing & Payments" @e78
+  - link "Child Panel" @e79
+  · "EARN"
+  - link "Affiliate Program" @e80
+  · "SUPPORT & HELP"
+  - link "AI Chat" @e81
+  - link "Support Tickets" @e82
+  - link "Help Center" @e83
+  · "LEGAL & INFO"
+  - link "About Us" @e84
+  - link "Contact Us" @e85
+  - link "Terms & Conditions" @e86
+  - link "Privacy Policy" @e87
+  - link "Refund Policy" @e88
+- button "Dark Mode" @e89
+- link "M milan milanparmar9621@gmail.com" @e90
+- button "Logout" @e91
+- main @e92
+  - heading "Profile & Settings" @e8 [level=1]
+  · "Manage your account and security"
+  · "FreePlan"
+  · "User"
+  - heading "Profile Information" @e9 [level=3]
+  · "Full Name"
+  - textbox @e15: milan
+  · "Email"
+  - textbox @e24 [disabled]: milanparmar9621@gmail.com
+  · "Role"
+  · "Member Since"
+  · "May 8, 2026"
+  - button "Save Changes" @e25
+  - heading "Change Password" @e26 [level=3]
+  · "Current Password"
+  - textbox @e27: [REDACTED SENSITIVE VALUE]
+  - button @e28
+  · "New Password"
+  - textbox @e29: [REDACTED SENSITIVE VALUE]
+  - button @e30
+  · "Confirm New Password"
+  - textbox @e31: [REDACTED SENSITIVE VALUE]
+  - button "Change Password" @e32
+
+===== help FAILED: [Errno 2] No such file or directory: '/home/hatch/workspace/.hatch-browser/snapshots/browser-task:1f884043-0498-452a-80b5-9e7cce024455/20260930T052046.549519875Z/ax.json' =====
+
+===== about =====
+# refs=33
+- button "Quick actions" @e1
+- navigation @e2
+  - link "Logo VEO Studio Ai" @e6
+    - image "Logo" @e107
+  - link "Home" @e7 dup=1/2
+  - link "About" @e8 dup=1/2
+  - link "Contact" @e9 dup=1/2
+  - link "Terms" @e33 dup=1/2
+  - link "Privacy" @e34 dup=1/2
+  - link "Refund Policy" @e35 dup=1/2
+  - button "EN" @e36 dup=1/2
+  - link "Dashboard" @e37 dup=1/2
+  - link "Home" @e38 dup=2/2
+  - link "About" @e39 dup=2/2
+  - link "Contact" @e40 dup=2/2
+  - link "Terms" @e41 dup=2/2
+  - link "Privacy" @e42 dup=2/2
+  - link "Refund Policy" @e43 dup=2/2
+  - link "Dashboard" @e44 dup=2/2
+  - button "EN" @e45 dup=2/2
+· "About Us"
+- heading "Empowering YouTube Creators with AI Automation" @e46 [level=1]
+· "We believe every creator deserves access to powerful tools that simplify video production, enhance q"
+- heading "Our Mission" @e47 [level=2]
+· "At VEO Studio Ai, our mission is to democratize video content creation. We harness the power of AI t"
+- heading "Our Team" @e48 [level=2]
+· "ZA"
+- heading "Zain Ali" @e49 [level=3]
+· "Founder & Lead Developer"
+· "Zain Ali is the visionary behind VEO Studio Ai. With deep expertise in AI, cloud computing, and full"
+- link "Connect on LinkedIn" @e50
+- heading "Our Technology" @e51 [level=2]
+· "We leverage the latest advancements in AI and cloud infrastructure to deliver a seamless, powerful e"
+- heading "AI-Powered Content" @e52 [level=3]
+· "Advanced AI models generate scripts, optimize SEO, create thumbnails, and analyze channels — deliver"
+- heading "Cloud Processing" @e53 [level=3]
+· "All heavy processing runs on scalable cloud infrastructure, ensuring fast rendering, reliable perfor"
+- heading "580+ TTS Voices" @e54 [level=3]
+· "Choose from over 580 text-to-speech voices across multiple languages and styles, with multi-characte"
+- heading "Our Vision" @e55 [level=2]
+· "We envision a future where anyone can create professional-grade YouTube content without expensive eq"
+- link "Get Started Today" @e56
+· "Developed by"
+- link "Zain Ali" @e57
+· "| Powered by"
+- link "DevZea" @e58
+· "©2026VEO Studio Ai. All rights reserved."
+
+===== contact =====
+# refs=41
+- button "Quick actions" @e1
+- navigation @e2
+  - link "Logo VEO Studio Ai" @e6
+    - image "Logo" @e107
+  - link "Home" @e7 dup=1/2
+  - link "About" @e8 dup=1/2
+  - link "Contact" @e9 dup=1/2
+  - link "Terms" @e33 dup=1/2
+  - link "Privacy" @e34 dup=1/2
+  - link "Refund Policy" @e35 dup=1/2
+  - button "EN" @e36 dup=1/2
+  - link "Dashboard" @e37 dup=1/2
+  - link "Home" @e38 dup=2/2
+  - link "About" @e39 dup=2/2
+  - link "Contact" @e40 dup=2/2
+  - link "Terms" @e41 dup=2/2
+  - link "Privacy" @e42 dup=2/2
+  - link "Refund Policy" @e43 dup=2/2
+  - link "Dashboard" @e44 dup=2/2
+  - button "EN" @e45 dup=2/2
+· "Get in Touch"
+- heading "Contact Us" @e3 [level=1]
+· "Have a question, suggestion, or need support? We'd love to hear from you."
+- heading "Send us a Message" @e4 [level=2]
+· "Name"
+- textbox "Your full name" @e5
+· "Email"
+- textbox "you@example.com" @e10
+· "Subject"
+- textbox "How can we help?" @e11
+- textbox "Tell us more about your inquiry..." @e12
+- button "Send Message" @e13
+- heading "Contact Information" @e14 [level=2]
+· "Email Support"
+- link "support@devzea.com" @e15
+· "WhatsApp Support"
+- link "Chat on WhatsApp" @e16
+- heading "Connect With Us" @e17 [level=3]
+- link "Zain Ali on LinkedIn" @e18
+- link "DevZea Website" @e19
+- heading "Frequently Asked Questions" @e20 [level=2]
+- heading "How do I get started with the platform?" @e21 [level=4]
+- heading "What payment methods do you accept?" @e22 [level=4]
+- heading "Can I cancel my subscription anytime?" @e23 [level=4]
+- heading "How many videos can I create per month?" @e24 [level=4]
+- heading "Do you offer support for custom integrations?" @e25 [level=4]
+· "Developed by"
+- link "Zain Ali" @e57
+· "| Powered by"
+- link "DevZea" @e58
+· "©2026VEO Studio Ai. All rights reserved."
+
+===== terms =====
+# refs=76
+- button "Quick actions" @e1
+- navigation @e2
+  - link "Logo VEO Studio Ai" @e6
+    - image "Logo" @e107
+  - link "Home" @e7 dup=1/2
+  - link "About" @e8 dup=1/2
+  - link "Contact" @e9 dup=1/2
+  - link "Terms" @e33 dup=1/2
+  - link "Privacy" @e34 dup=1/2
+  - link "Refund Policy" @e35 dup=1/2
+  - button "EN" @e36 dup=1/2
+  - link "Dashboard" @e37 dup=1/2
+  - link "Home" @e38 dup=2/2
+  - link "About" @e39 dup=2/2
+  - link "Contact" @e40 dup=2/2
+  - link "Terms" @e41 dup=2/2
+  - link "Privacy" @e42 dup=2/2
+  - link "Refund Policy" @e43 dup=2/2
+  - link "Dashboard" @e44 dup=2/2
+  - button "EN" @e45 dup=2/2
+· "Legal"
+- heading "Terms and Conditions" @e26 [level=1]
+· "Last Updated: February 15, 2025"
+- heading "1. Acceptance of Terms" @e27 [level=2]
+· "By accessing or usingVEO Studio Ai(the \"Platform\"), operated by DevZea (\"Company\", \"we\", \"us\", or \"o"
+· "We reserve the right to update or modify these Terms at any time without prior notice. Your continue"
+- heading "2. Account Registration" @e28 [level=2]
+· "To access certain features of the Platform, you must register for an account. When registering, you"
+- ListMarker "•" @e29
+· "Provide accurate, current, and complete information during registration"
+- ListMarker "•" @e30
+· "Maintain and promptly update your account information to keep it accurate and complete"
+- ListMarker "•" @e31
+· "Maintain the security and confidentiality of your login credentials"
+- ListMarker "•" @e32
+· "Accept all responsibility for activities that occur under your account"
+- ListMarker "•" @e46
+· "Notify us immediately of any unauthorized use of your account"
+- ListMarker "•" @e47
+· "Be at least 18 years of age or have parental/guardian consent"
+· "We reserve the right to suspend or terminate your account at our sole discretion, without notice, fo"
+- heading "3. User-Generated Data and Content License" @e48 [level=2]
+· "By using the Platform, you acknowledge and agree that the Company reserves the right to access, coll"
+- ListMarker "•" @e49
+· "Videos, images, thumbnails, and any multimedia content created through the Platform"
+- ListMarker "•" @e50
+· "Scripts, text, prompts, and any written content generated or input on the Platform"
+- ListMarker "•" @e51
+· "Analytics data, performance metrics, and channel statistics"
+- ListMarker "•" @e52
+· "Usage patterns, feature interactions, and behavioral data"
+- ListMarker "•" @e53
+· "Voice recordings, audio files, and text-to-speech outputs"
+- ListMarker "•" @e54
+· "SEO data, keywords, tags, and metadata"
+- ListMarker "•" @e55
+· "Account information and preferences"
+· "This data may be used by the Company for any purpose, including but not limited to:"
+- ListMarker "•" @e56
+· "Improving, enhancing, and optimizing the Platform and its services"
+- ListMarker "•" @e59
+· "Training, developing, and improving artificial intelligence and machine learning models"
+- ListMarker "•" @e60
+· "Research, analysis, and development of new features and products"
+- ListMarker "•" @e61
+· "Creating aggregated, anonymized, or de-identified datasets"
+- ListMarker "•" @e62
+· "Marketing, promotional, and business development activities"
+- ListMarker "•" @e63
+· "Any other lawful purpose as determined by the Company"
+· "By using the Platform, you grant the Company a perpetual, irrevocable, worldwide, royalty-free, full"
+- heading "4. User Responsibilities" @e64 [level=2]
+· "As a user of the Platform, you agree to:"
+- ListMarker "•" @e65
+· "Use the Platform only for lawful purposes and in compliance with all applicable laws"
+- ListMarker "•" @e66
+· "Not upload, post, or transmit any content that is illegal, harmful, threatening, abusive, defamatory"
+- ListMarker "•" @e67
+· "Not attempt to gain unauthorized access to any part of the Platform or its related systems"
+- ListMarker "•" @e68
+· "Not use the Platform to infringe upon the intellectual property rights of others"
+- ListMarker "•" @e69
+· "Not use automated systems or software to extract data from the Platform (scraping)"
+- ListMarker "•" @e70
+· "Not interfere with or disrupt the integrity or performance of the Platform"
+- ListMarker "•" @e71
+· "Comply with YouTube's Terms of Service and Community Guidelines when using our YouTube-related featu"
+- ListMarker "•" @e72
+· "Be solely responsible for all content you create, upload, or publish through the Platform"
+- heading "5. Intellectual Property" @e73 [level=2]
+· "The Platform, including its original content, features, functionality, design, and branding, is and"
+· "Content generated through the Platform using our AI tools, templates, and processing systems may be"
+· "You may not copy, modify, distribute, sell, or lease any part of the Platform or its software, nor m"
+- heading "6. Subscription and Payments" @e74 [level=2]
+· "Certain features of the Platform require a paid subscription. By subscribing, you agree to pay all f"
+· "We reserve the right to change subscription fees at any time. Any price changes will be communicated"
+- heading "7. Service Limitations and Modifications" @e75 [level=2]
+· "We strive to provide reliable and uninterrupted service, but we do not guarantee that the Platform w"
+- ListMarker "•" @e76
+· "Modify, suspend, or discontinue any part of the Platform at any time without notice"
+- ListMarker "•" @e77
+· "Impose limits on certain features or restrict access to parts or all of the Platform"
+- ListMarker "•" @e78
+· "Perform scheduled or unscheduled maintenance that may temporarily affect availability"
+- ListMarker "•" @e79
+· "Change, update, or remove features, tools, or content at our discretion"
+· "We shall not be liable to you or any third party for any modification, suspension, or discontinuance"
+- heading "8. Termination" @e80 [level=2]
+· "We may terminate or suspend your account and access to the Platform immediately, without prior notic"
+· "Upon termination, your right to use the Platform will immediately cease. All provisions of these Ter"
+· "You may terminate your account at any time by contactin
+
+===== privacy =====
+# refs=78
+- button "Quick actions" @e1
+- navigation @e2
+  - link "Logo VEO Studio Ai" @e6
+    - image "Logo" @e107
+  - link "Home" @e7 dup=1/2
+  - link "About" @e8 dup=1/2
+  - link "Contact" @e9 dup=1/2
+  - link "Terms" @e33 dup=1/2
+  - link "Privacy" @e34 dup=1/2
+  - link "Refund Policy" @e35 dup=1/2
+  - button "EN" @e36 dup=1/2
+  - link "Dashboard" @e37 dup=1/2
+  - link "Home" @e38 dup=2/2
+  - link "About" @e39 dup=2/2
+  - link "Contact" @e40 dup=2/2
+  - link "Terms" @e41 dup=2/2
+  - link "Privacy" @e42 dup=2/2
+  - link "Refund Policy" @e43 dup=2/2
+  - link "Dashboard" @e44 dup=2/2
+  - button "EN" @e45 dup=2/2
+· "Privacy"
+- heading "Privacy Policy" @e3 [level=1]
+· "Last Updated: February 15, 2025"
+· "DevZea (\"Company\", \"we\", \"us\", or \"our\") operatesVEO Studio Ai(the \"Platform\"). This Privacy Policy"
+- heading "1. Information We Collect" @e4 [level=2]
+· "We collect the following types of information:"
+· "1.1 Personal Information"
+- ListMarker "•" @e29
+· "Name, email address, and contact details provided during registration"
+- ListMarker "•" @e30
+· "Billing information and payment details (processed through secure third-party payment processors)"
+- ListMarker "•" @e31
+· "Profile information and account preferences"
+- ListMarker "•" @e32
+· "Communications you send to us (support requests, feedback, etc.)"
+· "1.2 Usage Data"
+- ListMarker "•" @e46
+· "Log data including IP address, browser type, device information, and operating system"
+- ListMarker "•" @e47
+· "Pages visited, features used, and time spent on the Platform"
+- ListMarker "•" @e49
+· "Clicks, interactions, and navigation patterns"
+- ListMarker "•" @e50
+· "Error logs and performance data"
+· "1.3 Generated Content"
+- ListMarker "•" @e51
+· "Videos, images, thumbnails, and multimedia content created through the Platform"
+- ListMarker "•" @e52
+· "Scripts, prompts, text inputs, and written content"
+- ListMarker "•" @e53
+· "Audio files, voice recordings, and text-to-speech outputs"
+- ListMarker "•" @e54
+· "SEO data, keywords, tags, and metadata generated or input by you"
+· "1.4 Analytics Data"
+- ListMarker "•" @e55
+· "YouTube channel analytics and performance metrics (when connected)"
+- ListMarker "•" @e56
+· "Video performance data and engagement statistics"
+- ListMarker "•" @e59
+· "Feature usage patterns and workflow analytics"
+- ListMarker "•" @e60
+· "A/B testing data and platform interaction metrics"
+- heading "2. How We Use Your Information" @e5 [level=2]
+· "We use the collected information for the following purposes:"
+- ListMarker "•" @e61
+· "Providing, operating, and maintaining the Platform and its features"
+- ListMarker "•" @e62
+· "Improving, personalizing, and enhancing the user experience"
+- ListMarker "•" @e63
+· "Training, developing, and improving our artificial intelligence and machine learning models"
+- ListMarker "•" @e65
+· "Analyzing usage patterns to develop new features and optimize existing ones"
+- ListMarker "•" @e66
+· "Processing transactions and managing subscriptions"
+- ListMarker "•" @e67
+· "Communicating with you about updates, support, and promotional materials"
+- ListMarker "•" @e68
+· "Detecting, preventing, and addressing technical issues and security threats"
+- ListMarker "•" @e69
+· "Conducting research, analysis, and development activities"
+- ListMarker "•" @e70
+· "Complying with legal obligations and enforcing our Terms and Conditions"
+- heading "3. Data Sharing and Disclosure" @e10 [level=2]
+· "We may share your information in the following circumstances:"
+- ListMarker "•" @e71
+· "Service Providers:"
+· "We share data with third-party service providers who assist in operating the Platform, including clo"
+- ListMarker "•" @e72
+· "AI Training:"
+· "User-generated content and usage data may be used to train and improve our AI models. This data may"
+- ListMarker "•" @e76
+· "Business Transfers:"
+· "In the event of a merger, acquisition, or sale of assets, your data may be transferred as part of th"
+- ListMarker "•" @e77
+· "Legal Requirements:"
+· "We may disclose your information if required by law, regulation, legal process, or governmental requ"
+- ListMarker "•" @e78
+· "Aggregated Data:"
+· "We may share aggregated, anonymized, or de-identified data that cannot reasonably be used to identif"
+- heading "4. Cookies and Tracking Technologies" @e11 [level=2]
+· "We use cookies, local storage, and similar tracking technologies to collect and store information ab"
+- ListMarker "•" @e79
+· "Maintain your session and authentication status"
+- ListMarker "•" @e82
+· "Remember your preferences and settings"
+- ListMarker "•" @e83
+· "Analyze Platform usage and performance"
+- ListMarker "•" @e84
+· "Deliver relevant content and improve user experience"
+· "You can manage cookie preferences through your browser settings. However, disabling cookies may affe"
+- heading "5. Data Retention" @e12 [level=2]
+· "We retain your personal information for as long as your account is active or as needed to provide yo"
+· "Generated content, usage data, and analytics data may be retained indefinitely for the purposes of A"
+- heading "6. User Rights" @e13 [level=2]
+· "Depending on your jurisdiction, you may have the following rights regarding your personal data:"
+- ListMarker "•" @e85
+· "The right to access and obtain a copy of your personal data"
+- ListMarker "•" @e86
+· "The right to request correction of inaccurate personal data"
+- ListMarker "•" @e87
+· "The right to request deletion of your personal data (subject to certain exceptions)"
+- ListMarker "•" @e91
+· "The right to object to or restrict processing of your personal data"
+- ListMarker "•" @e92
+· "The right to data portability"
+· "To exercise any of these rights, please contact us at"
+- link "support@devzea.com" @e14 dup=1/2
+· ". Please note that certain data rights may be limited by the data license granted in our Terms and C"
+- heading "7. Data Security" @e16 [level=2]
+· "We implement reasonable technical and organizational measures to protect your personal information a"
+- hea
+
+===== refund-policy =====
+# refs=47
+- button "Quick actions" @e1
+- navigation @e2
+  - link "Logo VEO Studio Ai" @e6
+    - image "Logo" @e107
+  - link "Home" @e7 dup=1/2
+  - link "About" @e8 dup=1/2
+  - link "Contact" @e9 dup=1/2
+  - link "Terms" @e33 dup=1/2
+  - link "Privacy" @e34 dup=1/2
+  - link "Refund Policy" @e35 dup=1/2
+  - button "EN" @e36 dup=1/2
+  - link "Dashboard" @e37 dup=1/2
+  - link "Home" @e38 dup=2/2
+  - link "About" @e39 dup=2/2
+  - link "Contact" @e40 dup=2/2
+  - link "Terms" @e41 dup=2/2
+  - link "Privacy" @e42 dup=2/2
+  - link "Refund Policy" @e43 dup=2/2
+  - link "Dashboard" @e44 dup=2/2
+  - button "EN" @e45 dup=2/2
+· "Policy"
+- heading "Refund Policy" @e15 [level=1]
+· "Last Updated: February 15, 2025"
+- heading "ALL SALES ARE FINAL — NO REFUNDS" @e24 [level=2]
+· "By purchasing a subscription or any service onVEO Studio Ai, you acknowledge and agree that all sale"
+- heading "1. No Refund Policy" @e25 [level=2]
+· "VEO Studio Ai, operated by DevZea, maintains a strict no-refund policy. All purchases, including sub"
+· "This policy applies to all transactions, including but not limited to:"
+- ListMarker "•" @e29
+· "Monthly and annual subscription plans"
+- ListMarker "•" @e30
+· "One-time purchases and credit top-ups"
+- ListMarker "•" @e31
+· "Upgrades and plan changes"
+- ListMarker "•" @e32
+· "Any add-on services or features"
+- heading "2. Digital Services Are Non-Refundable" @e26 [level=2]
+· "VEO Studio Aiprovides digital services including AI-powered video generation, text-to-speech process"
+· "When you subscribe to our services, you immediately gain access to our full suite of tools, AI proce"
+- heading "3. Subscription Cancellation" @e27 [level=2]
+· "You may cancel your subscription at any time through your account settings or by contacting our supp"
+- ListMarker "•" @e46
+· "Your subscription will remain active until the end of your current billing period"
+- ListMarker "•" @e47
+· "You will continue to have full access to all features until the subscription expires"
+- ListMarker "•" @e49
+· "No refund will be provided for the remaining days in your current billing period"
+- ListMarker "•" @e50
+· "No partial or prorated refunds will be issued"
+- ListMarker "•" @e51
+· "Your account will revert to the free tier (if available) after the billing period ends"
+· "Cancellation only prevents future charges. It does not entitle you to a refund of any fees already p"
+- heading "4. Free Trial" @e28 [level=2]
+· "We encourage all users to take advantage of our free trial or free tier (when available) before comm"
+· "We strongly recommend using the free trial period to thoroughly evaluate the Platform. Since all pai"
+- heading "5. Exceptions" @e48 [level=2]
+· "Refunds will only be considered in the following exceptional circumstances:"
+- ListMarker "•" @e52
+· "Where a refund is required by applicable consumer protection laws in your jurisdiction"
+- ListMarker "•" @e53
+· "In the case of duplicate charges caused by a technical error on our end (verified by our billing tea"
+- ListMarker "•" @e54
+· "Where mandated by a court order or regulatory authority"
+· "Any exception requests must be submitted within 7 days of the transaction date and will be reviewed"
+- heading "6. Chargebacks" @e64 [level=2]
+· "Filing a chargeback or payment dispute with your bank or payment provider instead of contacting us f"
+- heading "7. Contact for Billing Issues" @e73 [level=2]
+· "If you experience any billing issues, have questions about charges, or need assistance with your sub"
+- ListMarker "•" @e55
+· "Email:"
+- link "support@devzea.com" @e74
+- ListMarker "•" @e56
+· "Website:"
+- link "devzea.com" @e93
+· "Our support team is available to help resolve any billing concerns promptly and professionally. We s"
+· "Developed by"
+- link "Zain Ali" @e57
+· "| Powered by"
+- link "DevZea" @e58
+· "©2026VEO Studio Ai. All rights reserved."

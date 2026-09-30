@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="../assets/img/logo.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | VEO Studio Ai</title>
+<meta name="description" content="Sign in to your VEO Studio account">
+<meta name="author" content="Zain Ali">
+<meta name="publisher" content="DevZea">
+<meta name="theme-color" content="#8B5CF6">
+<link rel="stylesheet" href="../assets/css/index-DCalCK4u.css">
+<link rel="stylesheet" href="../assets/css/clone-extras.css">
+</head><body data-theme="light">
+<div class="auth-page"><div class="auth-card">
+<div class="auth-brand"><img alt="Logo" src="../assets/img/logo.png" style="width:44px;height:44px;object-fit:contain;"><h2>VEO Studio Ai</h2></div>
+
+<h1 class="auth-title">Sign in to your account</h1>
+<p class="auth-subtitle">Welcome back! Please enter your details.</p>
+<form data-demo>
+<div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="you@example.com" value="milanparmar9621@gmail.com"></div>
+<div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
+<button class="btn btn-primary btn-lg btn-block">Sign In</button>
+</form>
+<p class="auth-footer">Don&rsquo;t have an account? <a href="#">Sign up</a></p>
+<p class="text-muted text-sm" style="text-align:center;">Demo build &mdash; sign-in is stubbed.</p>
+
+</div></div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // theme toggle
+  var toggles = document.querySelectorAll('[data-theme-toggle]');
+  function setTheme(t){ document.documentElement.setAttribute('data-theme', t); document.body.setAttribute('data-theme', t); try{localStorage.setItem('veo-theme', t);}catch(e){} toggles.forEach(function(el){ el.classList.toggle('on', t==='dark'); }); }
+  var saved = null; try{ saved = localStorage.getItem('veo-theme'); }catch(e){}
+  if (saved) setTheme(saved);
+  toggles.forEach(function(el){ el.addEventListener('click', function(){ setTheme(document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark'); }); });
+  // sidebar collapse
+  var sb = document.querySelector('.sidebar');
+  document.querySelectorAll('[data-collapse]').forEach(function(el){ el.addEventListener('click', function(){ if(sb) sb.classList.toggle('sidebar-collapsed'); document.body.classList.toggle('sidebar-is-collapsed'); }); });
+  // dropdowns
+  document.querySelectorAll('[data-dropdown]').forEach(function(btn){
+    btn.addEventListener('click', function(e){ e.stopPropagation(); var m = btn.parentElement.querySelector('.dropdown-menu'); document.querySelectorAll('.dropdown-menu.open').forEach(function(x){ if(x!==m) x.classList.remove('open'); }); if(m) m.classList.toggle('open'); });
+  });
+  document.addEventListener('click', function(){ document.querySelectorAll('.dropdown-menu.open').forEach(function(x){ x.classList.remove('open'); }); });
+  // tabs
+  document.querySelectorAll('[data-tabs]').forEach(function(wrap){
+    var btns = wrap.querySelectorAll('.tab-btn');
+    btns.forEach(function(b){ b.addEventListener('click', function(){
+      btns.forEach(function(x){ x.classList.remove('active'); }); b.classList.add('active');
+      var panes = wrap.parentElement.querySelectorAll(':scope > .tab-pane, #'+wrap.getAttribute('data-tabs')+' .tab-pane');
+      document.querySelectorAll('#'+wrap.getAttribute('data-tabs')+' .tab-pane').forEach(function(p){ p.style.display = (p.getAttribute('data-pane')===b.getAttribute('data-tab')) ? '' : 'none'; });
+    }); });
+  });
+  // accordions
+  document.querySelectorAll('[data-accordion]').forEach(function(btn){ btn.addEventListener('click', function(){ var body = btn.nextElementSibling; var open = btn.classList.toggle('open'); if(body && body.classList.contains('accordion-body')) body.style.display = open ? '' : 'none'; }); });
+  // quick actions FAB toggle
+  var qaf = document.querySelector('.qaf-fab');
+  var qafActions = document.getElementById('qafActions');
+  if (qaf && qafActions) qaf.addEventListener('click', function(){ qafActions.style.display = qafActions.style.display==='none' ? 'flex' : 'none'; });
+  // rate modal
+  var rf = document.getElementById('rateFloat');
+  if (rf) rf.addEventListener('click', function(){ var m=document.getElementById('rateModal'); if(m) m.style.display='flex'; });
+  document.querySelectorAll('[data-close]').forEach(function(b){ b.addEventListener('click', function(){ var m=document.getElementById(b.getAttribute('data-close')); if(m) m.style.display='none'; }); });
+  var aiF = document.getElementById('aiFloat');
+  if (aiF) aiF.addEventListener('click', function(){ toast('AI Assistant — demo build'); });
+  // copy buttons
+  document.querySelectorAll('[data-copy]').forEach(function(btn){ btn.addEventListener('click', function(){ var t = document.querySelector(btn.getAttribute('data-copy')); if(t){ var txt = t.innerText || t.value || ''; if(navigator.clipboard) navigator.clipboard.writeText(txt); toast('Copied to clipboard'); } }); });
+  // toast helper
+  window.toast = function(msg){ var c = document.querySelector('.toast-container'); if(!c){ c = document.createElement('div'); c.className='toast-container'; document.body.appendChild(c);} var el=document.createElement('div'); el.className='toast toast-success'; el.textContent=msg; c.appendChild(el); setTimeout(function(){ el.remove(); }, 2500); };
+  // demo: prevent real submits
+  document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
+  document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
+});
+</script>
+</body></html>
