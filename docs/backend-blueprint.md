@@ -224,6 +224,27 @@ resolveProvider(capability, ctx: {plan, tool, userChoice?}): CapabilityProvider[
 - **Keys**: provider API keys per environment (Vault); child-panel tenants can later bring their own keys.
 - Workers depend only on `resolveProvider()` + the interface — never on a vendor SDK directly.
 
+**[DECIDED 2026-09-30, vaibhav]** — open-source models come through **all four transports**: fal.ai, Replicate, Together, and self-hosted endpoints. The registry therefore models transport explicitly:
+
+```ts
+type Transport = 'native'      // provider's own API: ElevenLabs, Gemini
+               | 'fal'         // fal.ai queue API: submit → poll → result
+               | 'replicate'   // Replicate predictions API: create → poll
+               | 'together'    // Together OpenAI-compatible endpoints
+               | 'self-hosted' // any OpenAI-compatible or custom HTTP endpoint
+interface ProviderRegistration {
+  name: string; capability: Capability; transport: Transport;
+  endpoint?: string;           // self-hosted base URL / custom path
+  authRef: string;             // Vault key name, never the value
+  defaultModel: string;        // e.g. 'fal-ai/ltx-video', 'hunyuan-video'
+  requestMap?: string;         // self-hosted only: named request/response mapping
+  costPerUnit?: number;        // for metering; null = unknown/free (self-hosted)
+  timeoutMs: number;
+}
+```
+- One `HttpApiProvider` adapter implements the interface for all four API transports; only the submit/poll/normalize strategy differs per transport. fal.ai and Replicate are natively async (submit → poll), which maps 1:1 onto the BullMQ job model.
+- Self-hosted endpoints are registered with a base URL + auth scheme + a named request/response mapping, so a new local model is a DB row, not a deploy.
+
 ---
 
 ## 6. Quota & billing logic
@@ -234,11 +255,18 @@ Free plan (observed): 1 thread · 2-min max video · 1 scene/cycle · 100 TTS ch
 - "Day" = **server-local midnight** **[PROPOSED default]** — the dashboard's "Resets in 23h 51m" is computed from this. (User-timezone midnight is the alternative; needs a stored tz per user.)
 - On job failure/cancellation, reserved quota is released.
 
-### 6.2 Billing = manual in v1 **[OBSERVED "Contact to Upgrade" → PROPOSED flow]**
-1. User clicks Contact to Upgrade → `POST /api/billing/upgrade-request` → `subscriptions` row with `status='pending'`, admin notified.
-2. Admin (future `/admin`, or direct DB in v0) verifies payment off-platform → sets `status='active'`, `plan_id`, dates.
-3. Downgrade/expiry → user falls back to Free; quotas recompute from the new plan immediately.
-- No payment gateway in v1. Razorpay/Stripe is an R5+ option (open question §8). Invoices: `invoices` table only when a gateway lands.
+### 6.2 Billing — personal use: no payment gateway, metering instead
+
+**[DECIDED 2026-09-30, vaibhav]**: this build is **personal, not commercial** — no payment gateway, no checkout, no invoices. Recommendation: agree completely; a gateway would add PCI/sandbox/settlement complexity for zero benefit here.
+
+What changes vs the commercial design:
+- **No subscriptions table lifecycle** — the user row carries a single `plan_id` (top tier) set once; the whole "Contact to Upgrade → pending → admin activates" flow is deleted.
+- **Plans become routing profiles, not products**: the `plans.limits` JSON stays, but its role changes — it now drives *provider routing* (quality-first vs cost-first chains) and *self-imposed budget caps*, not paywalls. Keep 2–3 profiles (e.g. `personal-max-quality`, `personal-eco`) instead of six commercial tiers.
+- **Quotas become spend guards**: daily/monthly caps per provider (e.g. "≤ $X/day on fal.ai") with a warning at 80% — the real risk for personal use is a runaway bulk job, not abuse by strangers. Same Redis atomic counters, same `daily_usage` ledger; the semantics change from *enforcement* to *protection*.
+- **Cost metering becomes the billing module**: every provider call already logs cost estimates (§5.4) → a **Spend dashboard** (per provider, per tool, per day/month) replaces the Billing page. This is the highest-value "billing" feature for personal use — you see exactly what each video/TTS run cost across fal.ai/Replicate/Together.
+- **Dropped as commercial-only**: Affiliate (`referrals` table, `/affiliate` routes), Child Panel white-label (`child_panels`, `/api/branding/*` per-tenant), Offers page, manual upgrade-request flow. Kept in schema as dormant or removed in R1 — recommendation: **remove**, less surface to maintain. API keys module stays (useful for your own automation/scripts).
+
+Auth stays (login protects the VPS), but single-user mode is fine — no registration funnel needed.
 
 ### 6.3 Child panel (Rs 20,000 one-time, **[OBSERVED]**)
 `child_panels` row + `subscriptions` (one-time, `ends_at=NULL`) → tenant gets branded `/api/branding/*` assets and (later) isolated subdomain. v1: branding + plan override only.
@@ -264,7 +292,7 @@ Free plan (observed): 1 thread · 2-min max video · 1 scene/cycle · 100 TTS ch
 | 2 | "Day" boundary for quota reset: server midnight vs each user's timezone? | **Server midnight** for v1 (one code path); user-tz later. |
 | 3 | Which provider accounts do you actually hold — ElevenLabs? Which video model API? | **RESOLVED 2026-09-30 (vaibhav)**: ElevenLabs + Gemini + open-source via API (LTX, Hunyuan, Qwen, more) — **no fixed provider per module**. Blueprint §5.4 redesigned as a routed provider registry with per-plan/per-tool chains, fallback, and cost metering. |
 | 3b | Open-source models "with api" — which API transport? (fal.ai / Replicate / Together / self-hosted endpoint?) | **Defaults to fal.ai/Replicate-style adapter**; confirm which one(s) you use so R3 wires the right transport. |
-| 4 | Payment gateway now or later? (Site says "Contact to Upgrade" — manual.) | **Manual v1** as designed above; Razorpay when volume justifies it. |
+| 4 | Payment gateway now or later? (Site says "Contact to Upgrade" — manual.) | **RESOLVED 2026-09-30 (vaibhav)**: personal use, not commercial — **no gateway at all**. Plans → routing profiles; quotas → spend guards; cost metering → Spend dashboard; Affiliate / Child Panel / Offers / upgrade-request flow **dropped**. See §6.2. |
 | 5 | Job progress: polling (proposed) vs WebSocket/SSE? | **Polling** v1 — matches the static pages, zero infra. |
 | 6 | Artifact storage: local disk v1 vs S3-compatible from day one? | **Local disk behind the storage interface** — migrate without code changes later. |
 
@@ -276,7 +304,7 @@ Free plan (observed): 1 thread · 2-min max video · 1 scene/cycle · 100 TTS ch
 - **R2 — Audio**: voices catalog + sync, TTS generate, multi-character TTS, voice history.
 - **R3 — Video pipelines**: bulk-videos, first-last-frame, long-video studio, bulk-images-to-video, lip-sync, UGC ads + provider adapters.
 - **R4 — YouTube automation**: niche finder, SEO generator, tags, channel analyzer (+ cache).
-- **R5 — Money & platform**: manual billing flow, API keys, affiliate, child panels, AI chat/support tickets.
+- **R5 — Personal platform**: API keys, AI chat/support tickets, **Spend dashboard** (replaces billing), provider registry admin (add/routing rules). Affiliate, child panels, offers: dropped (personal use).
 - **R6 — Hardening**: rate limits, tests, backups, docs, admin basics.
 
 Each release is independently deployable; the static frontend already exists for all of them.
