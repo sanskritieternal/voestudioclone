@@ -3,6 +3,8 @@ import { db } from '../db';
 import { config } from '../config';
 import { jobArtifactDir, writeSlateSvg, writeSilentWav, writeToneWav, wrapPcmAsWav } from './media';
 import { ElevenLabsTtsProvider } from './providers/elevenlabs';
+import { GeminiProvider } from './providers/gemini';
+import { HttpApiProvider } from './providers/httpApi';
 
 /**
  * Provider abstraction (blueprint §5.4).
@@ -37,8 +39,8 @@ export interface NewArtifact {
 }
 
 export type ProviderPoll =
-  | { status: 'processing'; progress: number }
-  | { status: 'completed'; artifacts: NewArtifact[]; costEstimate?: number; raw?: unknown }
+  | { status: 'processing'; progress: number; pollInMs?: number }
+  | { status: 'completed'; artifacts: NewArtifact[]; costEstimate?: number | null; raw?: unknown }
   | { status: 'failed'; error: string };
 
 export interface CapabilityProvider {
@@ -153,6 +155,7 @@ export interface RegistryRow {
   priority: number;
   enabled: boolean;
   default_model: string | null;
+  cost_per_unit: string | number | null;
   config: Record<string, unknown>;
 }
 
@@ -169,7 +172,7 @@ export async function resolveProviders(capability: Capability, _tool: string): P
 
   const rows = (await db
     .selectFrom('provider_registry')
-    .select(['id', 'name', 'capability', 'transport', 'priority', 'enabled', 'default_model', 'config'])
+    .select(['id', 'name', 'capability', 'transport', 'priority', 'enabled', 'default_model', 'cost_per_unit', 'config'])
     .where('capability', '=', capability)
     .where('enabled', '=', true)
     .orderBy('priority', 'asc')
@@ -179,8 +182,13 @@ export async function resolveProviders(capability: Capability, _tool: string): P
   for (const row of rows) {
     if (row.name === 'elevenlabs' && capability === 'tts') {
       chain.push(new ElevenLabsTtsProvider(row.default_model ?? 'eleven_multilingual_v2'));
+    } else if (row.name === 'gemini') {
+      // R3: native Gemini adapter (Veo video, Imagen image, LLM, TTS).
+      chain.push(new GeminiProvider(row));
+    } else if (['fal', 'replicate', 'together', 'self-hosted'].includes(row.transport)) {
+      // R3: generic HTTP adapter; endpoint + model come from the registry row.
+      chain.push(new HttpApiProvider(row));
     } else {
-      // Adapter not implemented yet (Gemini lands in R3, fal/Replicate/Together/self-hosted later).
       console.warn(`provider row "${row.id}" has no adapter yet; skipping`);
     }
   }

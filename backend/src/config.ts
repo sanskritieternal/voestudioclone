@@ -32,6 +32,12 @@ export const config = {
   // R2: ElevenLabs (native TTS transport). Empty = adapter falls back to the next provider in the chain.
   elevenlabsApiKey: opt('ELEVENLABS_API_KEY', ''),
   elevenlabsBase: opt('ELEVENLABS_BASE_URL', 'https://api.elevenlabs.io'),
+  // R3: video/image/LLM providers. Empty = adapter reports not-configured and the chain falls through.
+  geminiApiKey: opt('GEMINI_API_KEY', process.env.GOOGLE_API_KEY ?? ''),
+  falKey: opt('FAL_KEY', ''),
+  replicateToken: opt('REPLICATE_API_TOKEN', ''),
+  togetherKey: opt('TOGETHER_API_KEY', ''),
+  selfHostedKey: opt('SELF_HOSTED_API_KEY', ''),
 };
 
 if (config.nodeEnv === 'production' && config.jwtSecret.length < 32) {

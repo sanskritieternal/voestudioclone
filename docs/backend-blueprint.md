@@ -302,7 +302,7 @@ Auth stays (login protects the VPS), but single-user mode is fine — no registr
 
 - **R1 — Foundation**: auth, users, plans, quota ledger, projects CRUD, jobs infra, BullMQ wiring, Docker Compose. (Unlocks: login, dashboard quotas, my-jobs shell.) ✅ delivered 2026-09-30
 - **R2 — Audio + Spend**: voices catalog + sync, TTS generate, multi-character TTS, voice history, **real ElevenLabs adapter** (TTS/voice-sync/SFX/voice-design/voice-clone), **Spend dashboard** (replaces billing; per-tool cost breakdown). ✅ delivered 2026-09-30
-- **R3 — Video pipelines**: bulk-videos, first-last-frame, long-video studio, bulk-images-to-video, lip-sync, UGC ads + provider adapters (Gemini first, then fal/Replicate/Together/self-hosted via the HttpApiProvider adapter).
+- **R3 — Video pipelines**: bulk-videos, first-last-frame, long-video studio, bulk-images-to-video, lip-sync, UGC ads + provider adapters (Gemini first, then fal/Replicate/Together/self-hosted via the HttpApiProvider adapter). ✅ delivered 2026-09-30
 - **R4 — YouTube automation**: niche finder, SEO generator, tags, channel analyzer (+ cache).
 - **R5 — Personal platform**: API keys, AI chat/support tickets, provider registry admin (add/routing rules). Affiliate, child panels, offers: dropped (personal use).
 - **R6 — Hardening**: rate limits, tests, backups, docs, admin basics.

@@ -131,11 +131,12 @@ async function processJob(bjob: Job<WorkerData>): Promise<void> {
         if (res.status === 'processing') {
           await updateProgress(jobId, res.progress);
           await bjob.updateProgress(res.progress);
-          await sleep(2500);
+          // Real providers (video especially) ask for slower polling via pollInMs.
+          await sleep(res.pollInMs ?? 2500);
           continue;
         }
         if (res.status === 'completed') {
-          await completeJob(jobId, rec.user_id, p.name, res.artifacts, res.costEstimate ?? null);
+          await completeJob(jobId, rec.user_id, p.name, res.artifacts, res.costEstimate ?? null, rec.tool);
           return;
         }
         throw new Error(res.error);

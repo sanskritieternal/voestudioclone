@@ -1,6 +1,15 @@
-# VEO Studio Backend — R2 Audio + Spend
+# VEO Studio Backend — R3 Video Adapters
 
 Fastify + Postgres + Redis/BullMQ. See `../docs/backend-blueprint.md` for the full design.
+
+## R3 scope (delivered)
+
+- **Real Gemini adapter** (`src/services/providers/gemini.ts`): native transport for `video` (Veo `:predictLongRunning` → MP4 download), `image` (Imagen `:predict` → PNG), `llm` (`generateContent` → `.txt` artifact) and `tts` (audio modality → WAV). Needs `GEMINI_API_KEY` (or `GOOGLE_API_KEY`); without it the adapter reports `gemini_not_configured` and the chain yields to the stub.
+- **HttpApiProvider** (`src/services/providers/httpApi.ts`): one generic adapter for the `fal`, `replicate`, `together` and `self-hosted` transports, driven entirely by the provider registry row (model, base URL overrides, cost). Keys: `FAL_KEY`, `REPLICATE_API_TOKEN`, `TOGETHER_API_KEY`, `SELF_HOSTED_API_KEY`. The `self-hosted` transport is config-driven via the row's `config` jsonb (submit/poll paths, template substitution, JSON-path result extraction) — the escape hatch for any custom GPU endpoint.
+- **Registry wiring**: `resolveProviders()` now instantiates Gemini for `gemini` rows and `HttpApiProvider` for fal/replicate/together/self-hosted rows (migration 006 seeds reference prices + a disabled `flux-image-fal` row). Disabled rows are skipped; unconfigured adapters yield; real API errors fail loudly.
+- **Long-job polling**: adapters can return `pollInMs` on processing polls (video polls every 20s, not every 2.5s); remote media URLs are downloaded into the job's artifact dir so `/artifacts/...` URLs keep working.
+- **Cost fix**: async video/image jobs now log `tool` in `provider_cost_log` (was null for the generic chain path).
+- Smoke-tested: no-key mode falls through to stub (video + image); adapter integration-tested against a local fake fal.ai queue server (submit → poll → download → cost 0.25 logged).
 
 ## R2 scope (delivered)
 

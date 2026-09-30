@@ -139,3 +139,13 @@ export async function jobArtifactDir(userId: string, jobId: string): Promise<{ d
   await fs.mkdir(dir, { recursive: true });
   return { dir, urlPrefix: `/artifacts/${userId}/${jobId}` };
 }
+
+/** Download a remote URL to a local file (real provider artifacts). Follows redirects. */
+export async function downloadToFile(url: string, filePath: string, headers: Record<string, string> = {}): Promise<number> {
+  const res = await fetch(url, { headers, redirect: 'follow' });
+  if (!res.ok) throw new Error(`download_${res.status}: ${url.slice(0, 120)}`);
+  const buf = Buffer.from(await res.arrayBuffer());
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, buf);
+  return buf.length;
+}
