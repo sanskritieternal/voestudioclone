@@ -84,13 +84,27 @@ export async function reserveQuota(userId: string, plan: Plan, usage: QuotaUsage
   return { ok: false, field, limit: plan.limits[FIELD_TO_LIMIT[field]], used };
 }
 
+const RELEASE_SCRIPT = `
+local key = KEYS[1]
+for i = 1, #ARGV, 2 do
+  local field = ARGV[i]
+  local amount = tonumber(ARGV[i+1])
+  local used = tonumber(redis.call('HGET', key, field) or '0')
+  redis.call('HSET', key, field, math.max(0, used - amount))
+end
+return 1
+`;
+
 export async function releaseQuota(userId: string, usage: QuotaUsage): Promise<void> {
   const key = quotaKey(userId, todayStr());
-  const pipe = redis.pipeline();
+  const args: string[] = [];
   for (const [field, amount] of Object.entries(usage)) {
-    if (amount && amount > 0) pipe.hincrby(key, field, -amount);
+    if (amount && amount > 0) args.push(field, String(amount));
   }
-  await pipe.exec();
+  if (args.length === 0) return;
+  // R6: clamp at zero — a double release (or releasing more than reserved)
+  // must never push usage negative and hand out free quota.
+  await redis.eval(RELEASE_SCRIPT, 1, key, ...args);
 }
 
 export async function readQuotas(userId: string, plan: Plan) {

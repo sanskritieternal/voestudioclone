@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { planOf } from '../middleware/entitlement';
+import { expensiveLimiter } from '../middleware/rateLimit';
 import { reserveQuota, releaseQuota } from '../services/quota';
 import {
   analyzeChannel, breakdownVideo, findNiche, generateSeo, generateTags,
@@ -69,6 +70,7 @@ export default async function youtubeRoutes(app: FastifyInstance): Promise<void>
 
   // ---- Channel analyzer ----
   app.post('/channel-analyze', {
+    preHandler: expensiveLimiter,
     schema: { body: { type: 'object', required: ['channel_url'], properties: { channel_url: { type: 'string', minLength: 3, maxLength: 500 } } } },
   }, async (req, reply) => {
     const { channel_url } = req.body as { channel_url: string };
@@ -82,6 +84,7 @@ export default async function youtubeRoutes(app: FastifyInstance): Promise<void>
 
   // ---- Video breakdown ----
   app.post('/video-breakdown', {
+    preHandler: expensiveLimiter,
     schema: { body: { type: 'object', required: ['video_url'], properties: { video_url: { type: 'string', minLength: 3, maxLength: 500 } } } },
   }, async (req, reply) => {
     const { video_url } = req.body as { video_url: string };
@@ -95,6 +98,7 @@ export default async function youtubeRoutes(app: FastifyInstance): Promise<void>
 
   // ---- Niche finder ----
   app.post('/niche-finder', {
+    preHandler: expensiveLimiter,
     schema: { body: { type: 'object', required: ['keyword'], properties: { keyword: { type: 'string', minLength: 2, maxLength: 200 }, max_results: { type: 'number' } } } },
   }, async (req, reply) => {
     const { keyword, max_results } = req.body as { keyword: string; max_results?: number };
@@ -108,6 +112,7 @@ export default async function youtubeRoutes(app: FastifyInstance): Promise<void>
 
   // ---- SEO generator (LLM) ----
   app.post('/seo-generate', {
+    preHandler: expensiveLimiter,
     schema: { body: { type: 'object', required: ['title'], properties: { title: { type: 'string', minLength: 3, maxLength: 300 }, category: { type: 'string', maxLength: 100 } } } },
   }, async (req, reply) => {
     const { title, category } = req.body as { title: string; category?: string };
@@ -124,6 +129,7 @@ export default async function youtubeRoutes(app: FastifyInstance): Promise<void>
 
   // ---- Tags generator (LLM) ----
   app.post('/tags-generate', {
+    preHandler: expensiveLimiter,
     schema: { body: { type: 'object', required: ['topic'], properties: { topic: { type: 'string', minLength: 2, maxLength: 200 }, platform: { type: 'string', maxLength: 50 } } } },
   }, async (req, reply) => {
     const { topic, platform } = req.body as { topic: string; platform?: string };
@@ -140,6 +146,7 @@ export default async function youtubeRoutes(app: FastifyInstance): Promise<void>
 
   // ---- Master prompt (video breakdown + LLM) ----
   app.post('/master-prompt', {
+    preHandler: expensiveLimiter,
     schema: { body: { type: 'object', properties: { video_url: { type: 'string', maxLength: 500 }, notes: { type: 'string', maxLength: 2000 } } } },
   }, async (req, reply) => {
     const { video_url, notes } = req.body as { video_url?: string; notes?: string };

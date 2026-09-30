@@ -1,6 +1,14 @@
-# VEO Studio Backend — R5 Personal Platform
+# VEO Studio Backend — R6 Hardening
 
 Fastify + Postgres + Redis/BullMQ. See `../docs/backend-blueprint.md` for the full design.
+
+## R6 scope (delivered)
+
+- **Rate limits**: global 120 req/min per user + 10 req/min per IP on login (both pre-existing) plus a new **burst guard** — `expensiveLimiter` (30 req/min per user) on LLM chat messages, sync TTS/SFX, all six YouTube analysis endpoints, and voice design/clone starts. Quota still gates daily spend; the limiter stops runaway loops minute-to-minute.
+- **Test suite** (`npm test`, 17 integration tests, node:test, no new deps): auth (login/me/refresh-rotation/logout), AI chat (thread CRUD, per-user isolation, honest 503 path with quota release + message rollback, burst limiter → 429), support tickets (full lifecycle, invalid status, isolation), providers (key write-only lifecycle, registry admin add/enable/move/delete, no key leakage), quota service (reserve/release/over-limit, release clamped at zero). Runs against a disposable `veo_test` DB + Redis db 1 — the dev DB is never touched. Caught and fixed a real bug: `releaseQuota` could drive usage negative (now clamped via Lua).
+- **Backups**: `backend/scripts/backup.sh` — `pg_dump` (custom format) + artifacts tarball, keeps the last 7 of each (`BACKUP_KEEP`), cron-ready. Restore steps in `docs/operations.md`.
+- **Docs**: `docs/operations.md` — env vars, Docker deploy, CLI admin, backup/restore, tests, rate limits, troubleshooting table, security notes.
+- **Admin basics**: CLI `list-users` (plans + today's quota usage), `user-info --email`, `set-plan --email --plan`; existing `create-user`, `sync-voices` unchanged. (Also fixed: CLI now disconnects Redis so it exits cleanly.)
 
 ## R5 scope (delivered)
 

@@ -6,6 +6,7 @@ import { db } from '../db';
 import { config } from '../config';
 import { createJob, findJobByIdempotency } from '../services/jobs';
 import { planOf, requireFeature } from '../middleware/entitlement';
+import { expensiveLimiter } from '../middleware/rateLimit';
 import { reserveQuota, releaseQuota, reconcileUsage, type QuotaUsage } from '../services/quota';
 import { resolveProviders, asVoiceLab, isNotConfiguredError, type Capability } from '../services/providers';
 import { logCost } from '../services/cost';
@@ -43,6 +44,7 @@ export default async function toolRoutes(app: FastifyInstance): Promise<void> {
 
   // ---- TTS: synchronous (fast path) ----
   app.post('/tts/generate', {
+    preHandler: expensiveLimiter,
     schema: { body: { type: 'object', required: ['text'], properties: { text: { type: 'string', minLength: 1, maxLength: 20000 }, voice_id: { type: 'string' }, provider: { type: 'string' } } } },
   }, async (req, reply) => {
     const { text, voice_id } = req.body as { text: string; voice_id?: string };
@@ -148,6 +150,7 @@ export default async function toolRoutes(app: FastifyInstance): Promise<void> {
 
   // ---- R2: Sound effects (synchronous, voice-lab providers) ----
   app.post('/sfx/generate', {
+    preHandler: expensiveLimiter,
     schema: { body: { type: 'object', required: ['prompt'], properties: { prompt: { type: 'string', minLength: 1, maxLength: 500 }, duration_seconds: { type: 'number', minimum: 0.5, maximum: 30 } } } },
   }, async (req, reply) => {
     const { prompt, duration_seconds } = req.body as { prompt: string; duration_seconds?: number };
@@ -190,6 +193,7 @@ export default async function toolRoutes(app: FastifyInstance): Promise<void> {
 
   // ---- R2: Multi-character TTS (async: one job, N segments, one concatenated file) ----
   app.post('/multi-character-tts/start', {
+    preHandler: expensiveLimiter,
     schema: {
       body: {
         type: 'object', required: ['segments'],
@@ -226,6 +230,7 @@ export default async function toolRoutes(app: FastifyInstance): Promise<void> {
 
   // ---- R2: Voice design (async) ----
   app.post('/voice-design/start', {
+    preHandler: expensiveLimiter,
     schema: {
       body: {
         type: 'object', required: ['name', 'description'],
@@ -253,7 +258,7 @@ export default async function toolRoutes(app: FastifyInstance): Promise<void> {
   });
 
   // ---- R2: Voice clone (multipart upload, async) ----
-  app.post('/voice-clone/start', async (req, reply) => {
+  app.post('/voice-clone/start', { preHandler: expensiveLimiter }, async (req, reply) => {
     const dup = await checkIdempotent(req, reply);
     if (dup) return reply.code(200).send(dup);
 

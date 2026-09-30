@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { db } from '../db';
 import { planOf } from '../middleware/entitlement';
+import { expensiveLimiter } from '../middleware/rateLimit';
 import { reserveQuota, releaseQuota, reconcileUsage } from '../services/quota';
 import { chatComplete, titleFrom, type ChatMsg } from '../services/chat';
 
@@ -72,6 +73,7 @@ export default async function aiChatRoutes(app: FastifyInstance): Promise<void> 
   // Send a message → assistant reply.
   app.post('/threads/:id/messages', {
     schema: { body: { type: 'object', required: ['content'], properties: { content: { type: 'string', minLength: 1, maxLength: 8000 } } } },
+    preHandler: expensiveLimiter,
   }, async (req, reply) => {
     const { id } = req.params as { id: string };
     const { content } = req.body as { content: string };

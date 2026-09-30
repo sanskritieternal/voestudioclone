@@ -305,7 +305,7 @@ Auth stays (login protects the VPS), but single-user mode is fine — no registr
 - **R3 — Video pipelines**: bulk-videos, first-last-frame, long-video studio, bulk-images-to-video, lip-sync, UGC ads + provider adapters (Gemini first, then fal/Replicate/Together/self-hosted via the HttpApiProvider adapter). ✅ delivered 2026-09-30
 - **R4 — YouTube automation**: niche finder, SEO generator, tags, channel analyzer, video breakdown, master prompt (+ 24h cache, honest 503s without keys). ✅ delivered 2026-09-30
 - **R5 — Personal platform**: AI chat/support tickets, provider registry admin (add/routing rules). Affiliate, child panels, offers: dropped (personal use). **[DELIVERED 2026-09-30: `/api/ai-chat` threads+messages with ai_tokens quota, `/api/support` tickets+replies, registry add/enable/reorder/delete; AI Chat + Support pages wired, new `/providers` registry page, dashboard token cards show live quota]**.
-- **R6 — Hardening**: rate limits, tests, backups, docs, admin basics.
+- **R6 — Hardening**: rate limits, tests, backups, docs, admin basics. **[DELIVERED 2026-09-30: expensiveLimiter (30/min) on LLM chat/TTS/YouTube/voice-design burst endpoints; 17-test node:test integration suite (auth/chat/support/providers/quota/rate-limit) on disposable veo_test DB — caught+fixed releaseQuota negative-usage bug; scripts/backup.sh (pg_dump + artifacts, 7-day rotation); docs/operations.md runbook; CLI list-users/set-plan/user-info]**.
 
 Each release is independently deployable; the static frontend already exists for all of them.
 

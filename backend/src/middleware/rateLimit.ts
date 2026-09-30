@@ -27,3 +27,15 @@ export const authedLimiter = rateLimit({
   max: 120,
   key: (req) => `user:${(req.user as any)?.id ?? req.ip}`,
 });
+
+/**
+ * R6 — burst guard for the expensive endpoints (LLM chat, sync TTS/SFX,
+ * YouTube analyses, voice design/clone). Quota already gates daily spend;
+ * this stops runaway loops minute-to-minute. Wired per-route AFTER the
+ * app-level authenticate hook, so req.user is available for the key.
+ */
+export const expensiveLimiter = rateLimit({
+  windowSec: 60,
+  max: 30,
+  key: (req) => `expensive:${(req.user as any)?.id ?? req.ip}`,
+});

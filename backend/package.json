@@ -1,1 +1,40 @@
-{"dependencies":{"@fastify/cors":"^10.0.1","@fastify/jwt":"^9.0.0","@fastify/multipart":"^10.1.2","@fastify/static":"^8.0.0","bcryptjs":"^3.0.2","bullmq":"^5.12.0","dotenv":"^16.4.5","fastify":"^5.2.0","ioredis":"^5.4.1","kysely":"^0.28.2","pg":"^8.13.1"},"description":"VEO Studio Ai clone — backend (R1 foundation). Fastify + Postgres + Redis/BullMQ.","devDependencies":{"@types/bcryptjs":"^2.4.6","@types/node":"^22.9.0","@types/pg":"^8.11.0","tsx":"^4.19.2","typescript":"^5.6.3"},"engines":{"node":">=20"},"name":"veostudio-backend","private":true,"scripts":{"build":"tsc -p tsconfig.json","cli":"node dist/cli.js","dev":"tsx watch src/index.ts","dev:worker":"tsx watch src/worker.ts","migrate":"node dist/migrate.js","start":"node dist/index.js","typecheck":"tsc --noEmit","worker":"node dist/worker.js"},"version":"0.1.0"}
+{
+  "dependencies": {
+    "@fastify/cors": "^10.0.1",
+    "@fastify/jwt": "^9.0.0",
+    "@fastify/multipart": "^10.1.2",
+    "@fastify/static": "^8.0.0",
+    "bcryptjs": "^3.0.2",
+    "bullmq": "^5.12.0",
+    "dotenv": "^16.4.5",
+    "fastify": "^5.2.0",
+    "ioredis": "^5.4.1",
+    "kysely": "^0.28.2",
+    "pg": "^8.13.1"
+  },
+  "description": "VEO Studio Ai clone \u2014 backend (R1 foundation). Fastify + Postgres + Redis/BullMQ.",
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.9.0",
+    "@types/pg": "^8.11.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "name": "veostudio-backend",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "cli": "node dist/cli.js",
+    "dev": "tsx watch src/index.ts",
+    "dev:worker": "tsx watch src/worker.ts",
+    "migrate": "node dist/migrate.js",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "worker": "node dist/worker.js",
+    "test": "npm run build && node --test --test-concurrency=1 dist/test/*.test.js"
+  },
+  "version": "0.1.0"
+}
