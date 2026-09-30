@@ -193,3 +193,23 @@
 
 /* ---------- plans: keep price + period on one line ---------- */
 .plan-price{white-space:nowrap}
+
+/* ---------- R4: YouTube tool result components ---------- */
+.md-h{font-size:1rem;font-weight:700;margin:14px 0 6px}
+.md-h:first-child{margin-top:0}
+.md-p{margin:6px 0;line-height:1.55}
+.md-list{margin:6px 0 6px 18px;line-height:1.55;list-style:disc}
+.md-list li{margin:3px 0}
+.yt-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}
+.yt-stat{background:var(--bg-secondary,#f6f7f9);border:1px solid var(--border);border-radius:var(--radius,10px);padding:10px 12px}
+.yt-stat .v{font-size:1.15rem;font-weight:800}
+.yt-stat .l{font-size:.78rem;color:var(--text-muted)}
+.yt-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--border)}
+.yt-row:first-child{border-top:none}
+.yt-row-main{min-width:0}
+.yt-row-main a{font-weight:600;color:var(--text-primary);text-decoration:none}
+.yt-row-main a:hover{text-decoration:underline}
+.yt-row-stats{display:flex;gap:14px;flex-shrink:0;font-size:.85rem;color:var(--text-secondary);align-items:flex-start}
+.yt-channel-head{display:flex;gap:14px;align-items:center;margin-bottom:6px}
+.yt-channel-head img{width:64px;height:64px;border-radius:50%;object-fit:cover}
+[data-theme="dark"] .yt-stat{background:rgba(255,255,255,.04)}

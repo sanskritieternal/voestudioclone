@@ -102,9 +102,10 @@
 
 <div class="page-header stagger-1"><div><h1 class="page-title">YouTube Automation History</h1><p class="page-subtitle">0 total searches</p></div>
 <div class="page-actions"><div class="search-wrapper"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input class="form-input search-input" placeholder="Search history..."></div><select class="form-select" style="max-width:180px;"><option>All Tools</option><option>Niche Finder</option><option>SEO Generator</option><option>Tags Generator</option><option>Channel Analyzer</option></select></div></div>
-<div class="empty-state card stagger-2"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg><h3>No searches yet</h3><p>Your YouTube automation history will appear here.</p></div>
+<div id="ytHistory"><div class="card"><p class="text-muted">Loading history…</p></div></div>
 
 </div>
+
 </main>
 <nav class="mobile-nav"><a class="mobile-nav-item " href="/dashboard" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg> <span>Home</span></a><a class="mobile-nav-item " href="/projects" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-open" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></svg> <span>Projects</span></a><a class="mobile-nav-item " href="/projects/new" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-plus" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg> <span>Create</span></a><a aria-current="page" class="mobile-nav-item active" href="/tools" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wrench" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"></path></svg> <span>Tools</span></a></nav>
 </div>
@@ -161,5 +162,84 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
   document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
 });
+</script>
+<script src="../../assets/js/yt-tools.js"></script>
+<script>
+(function(){
+  var listEl = document.getElementById('ytHistory');
+  var searchInput = document.querySelector('.search-input');
+  var kindSelect = document.querySelector('.page-actions .form-select');
+  var all = [];
+  var KIND_LABEL = { niche: 'Niche Finder', seo: 'SEO Generator', tags: 'Tags Generator', channel: 'Channel Analyzer', video: 'Video Breakdown', 'master-prompt': 'Master Prompt' };
+  function inputSummary(kind, input){
+    input = input || {};
+    if (kind === 'niche') return input.keyword || '';
+    if (kind === 'seo') return input.title || '';
+    if (kind === 'tags') return input.topic || '';
+    if (kind === 'channel') return input.channel_url || '';
+    if (kind === 'video' || kind === 'master-prompt') return input.video_url || input.notes || '';
+    return Object.values(input).slice(0, 2).join(' · ');
+  }
+  function render(){
+    var q = (searchInput && searchInput.value || '').toLowerCase();
+    var kf = kindSelect && kindSelect.selectedIndex > 0 ? kindSelect.options[kindSelect.selectedIndex].text : '';
+    var kindMap = { 'Niche Finder': 'niche', 'SEO Generator': 'seo', 'Tags Generator': 'tags', 'Channel Analyzer': 'channel' };
+    var items = all.filter(function(it){
+      var label = KIND_LABEL[it.kind] || it.kind;
+      if (kf && kindMap[kf] && it.kind !== kindMap[kf]) return false;
+      if (q && (label + ' ' + inputSummary(it.kind, it.input)).toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    });
+    document.querySelector('.page-subtitle').textContent = all.length + ' total searches';
+    if (!items.length) {
+      listEl.innerHTML = '<div class="empty-state card"><h3>No searches yet</h3><p>Your YouTube automation history will appear here.</p></div>';
+      return;
+    }
+    listEl.innerHTML = items.map(function(it){
+      var label = KIND_LABEL[it.kind] || it.kind;
+      return '<div class="card" style="margin-bottom:12px"><div class="card-header"><h3>' + Yt.esc(label) + '</h3>'
+        + '<span class="text-muted text-sm">' + Yt.fmtDate(it.created_at) + '</span></div>'
+        + '<p class="md-p">' + Yt.esc(inputSummary(it.kind, it.input)) + '</p>'
+        + '<div style="display:flex;gap:8px"><button class="btn btn-secondary btn-sm" data-view="' + it.id + '">View result</button>'
+        + '<button class="btn btn-ghost btn-sm" data-del="' + it.id + '">Delete</button></div>'
+        + '<div class="yt-detail" id="d-' + it.id + '" style="display:none;margin-top:10px"></div></div>';
+    }).join('');
+    listEl.querySelectorAll('[data-view]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var id = b.getAttribute('data-view');
+        var box = document.getElementById('d-' + id);
+        if (box.style.display !== 'none') { box.style.display = 'none'; return; }
+        box.style.display = 'block';
+        box.innerHTML = '<p class="text-muted">Loading…</p>';
+        fetch(Yt.apiBase() + '/api/youtube/history/' + id, { headers: Yt.headers() })
+          .then(function(r){ return r.json(); })
+          .then(function(j){
+            var res = j.result || {};
+            if (res.markdown) box.innerHTML = Yt.markdown(res.markdown);
+            else box.innerHTML = '<pre class="prompt-block">' + Yt.esc(JSON.stringify(res, null, 2).slice(0, 4000)) + '</pre>';
+          })
+          .catch(function(e){ box.innerHTML = '<p>Failed to load: ' + Yt.esc(e.message) + '</p>'; });
+      });
+    });
+    listEl.querySelectorAll('[data-del]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var id = b.getAttribute('data-del');
+        if (!confirm('Delete this analysis?')) return;
+        fetch(Yt.apiBase() + '/api/youtube/history/' + id, { method: 'DELETE', headers: Yt.headers() })
+          .then(function(){ load(); });
+      });
+    });
+  }
+  function load(){
+    if (!Yt.token()) { listEl.innerHTML = '<div class="card"><p>Log in to see your history.</p></div>'; return; }
+    fetch(Yt.apiBase() + '/api/youtube/history', { headers: Yt.headers() })
+      .then(function(r){ return r.json(); })
+      .then(function(j){ all = j.items || []; render(); })
+      .catch(function(e){ listEl.innerHTML = '<div class="card"><p>Could not load history: ' + Yt.esc(e.message) + '</p></div>'; });
+  }
+  if (searchInput) searchInput.addEventListener('input', render);
+  if (kindSelect) kindSelect.addEventListener('change', render);
+  load();
+})();
 </script>
 </body></html>

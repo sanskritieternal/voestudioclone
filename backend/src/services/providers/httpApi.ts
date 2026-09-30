@@ -1,6 +1,5 @@
 import crypto from 'node:crypto';
 import { promises as fs } from 'node:fs';
-import { config } from '../../config';
 import { jobArtifactDir, downloadToFile } from '../media';
 import type { CapabilityProvider, ProviderCall, ProviderHandle, ProviderPoll, NewArtifact, Capability, RegistryRow } from '../providers';
 
@@ -33,18 +32,17 @@ import type { CapabilityProvider, ProviderCall, ProviderHandle, ProviderPoll, Ne
  * notation with [n] indices, e.g. "response.images[0].url".
  */
 
+import { providerKey } from '../credentials';
+
 type Transport = 'fal' | 'replicate' | 'together' | 'self-hosted';
 
 function notConfigured(transport: string): Error {
   return Object.assign(new Error(`${transport}_not_configured`), { code: `${transport}_not_configured` });
 }
 
-function keyFor(transport: Transport): string {
-  const k =
-    transport === 'fal' ? config.falKey
-    : transport === 'replicate' ? config.replicateToken
-    : transport === 'together' ? config.togetherKey
-    : config.selfHostedKey;
+/** DB credential (API Keys page) wins; the transport's env var is the fallback. */
+async function keyFor(transport: Transport): Promise<string> {
+  const k = await providerKey(transport);
   if (!k) throw notConfigured(transport);
   return k;
 }
@@ -116,7 +114,7 @@ export class HttpApiProvider implements CapabilityProvider {
   }
 
   async submit(call: ProviderCall): Promise<ProviderHandle> {
-    keyFor(this.transport); // fail fast so the chain can fall through
+    await keyFor(this.transport); // fail fast so the chain can fall through
     if (!this.model && this.transport !== 'self-hosted') {
       throw new Error(`${this.transport}_misconfigured: registry row has no default_model`);
     }
@@ -175,7 +173,7 @@ export class HttpApiProvider implements CapabilityProvider {
   }
 
   private async pollFal(st: ApiState, call: ProviderCall): Promise<ProviderPoll> {
-    const key = keyFor('fal');
+    const key = await keyFor('fal');
     const headers = { Authorization: `Key ${key}`, 'Content-Type': 'application/json' };
     const prompt = st.prompts[st.idx];
     if (!st.remoteId) {
@@ -211,7 +209,7 @@ export class HttpApiProvider implements CapabilityProvider {
 
   // ------------------------------------------------------------ replicate
   private async pollReplicate(st: ApiState, call: ProviderCall): Promise<ProviderPoll> {
-    const token = keyFor('replicate');
+    const token = await keyFor('replicate');
     const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Prefer: 'wait' };
     const prompt = st.prompts[st.idx];
     if (!st.remoteId) {
@@ -241,7 +239,7 @@ export class HttpApiProvider implements CapabilityProvider {
 
   // ------------------------------------------------------------- together
   private async pollTogether(st: ApiState, call: ProviderCall): Promise<ProviderPoll> {
-    const key = keyFor('together');
+    const key = await keyFor('together');
     const headers = { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
     const prompt = st.prompts[st.idx];
     if (this.capability === 'image') {
@@ -290,7 +288,7 @@ export class HttpApiProvider implements CapabilityProvider {
 
   // ---------------------------------------------------------- self-hosted
   private async pollSelfHosted(st: ApiState, call: ProviderCall): Promise<ProviderPoll> {
-    const key = keyFor('self-hosted');
+    const key = await keyFor('self-hosted');
     const base = String(this.cfg.base_url ?? '').replace(/\/$/, '');
     if (!base) throw new Error('self-hosted_misconfigured: config.base_url is required');
     const authCfg = (this.cfg.auth ?? {}) as { header?: string; scheme?: string };

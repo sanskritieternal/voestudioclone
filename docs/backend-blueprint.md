@@ -221,7 +221,7 @@ resolveProvider(capability, ctx: {plan, tool, userChoice?}): CapabilityProvider[
 - **Routing rules** (admin-configurable, stored in DB): per plan tier and/or per tool, e.g. Free → cheapest chain first (open-source), Premium → quality-first (Gemini/ElevenLabs). Where the UI offers a model picker (**[OBSERVED]** on video tools), `userChoice` pins the provider.
 - **Fallback**: if a provider errors or times out, the worker walks the chain — no failed job until the chain is exhausted. **Refined 2026-09-30 (R2)**: an *unconfigured* provider (no API key, error code `*_not_configured`) yields to the next provider so the pipeline never hard-fails while keys are being set up; any *other* error (bad key, 4xx/5xx, timeout) is fatal and fails the job loudly instead of silently producing stub artifacts that look like real output. Implemented in `isNotConfiguredError()` (`backend/src/services/providers.ts`).
 - **Cost metering**: every provider call logs `{provider, capability, units, cost_estimate}` → feeds margin visibility per plan and the dashboard's token cards.
-- **Keys**: provider API keys per environment (Vault); child-panel tenants can later bring their own keys.
+- **Keys**: provider API keys per environment (Vault); child-panel tenants can later bring their own keys. **Added 2026-09-30 (R4)**: keys can also be managed in the UI (API Keys page → Provider integrations), stored in the `provider_credentials` table and served via `GET/PUT/DELETE /api/providers/:name/key` (values are write-only; the API only reports configured/source). Resolution order is **DB value → env var fallback** (`providerKey()` in `backend/src/services/credentials.ts`), so existing env-based deployments keep working unchanged.
 - Workers depend only on `resolveProvider()` + the interface — never on a vendor SDK directly.
 
 **[DECIDED 2026-09-30, vaibhav]** — open-source models come through **all four transports**: fal.ai, Replicate, Together, and self-hosted endpoints. The registry therefore models transport explicitly:
@@ -303,8 +303,8 @@ Auth stays (login protects the VPS), but single-user mode is fine — no registr
 - **R1 — Foundation**: auth, users, plans, quota ledger, projects CRUD, jobs infra, BullMQ wiring, Docker Compose. (Unlocks: login, dashboard quotas, my-jobs shell.) ✅ delivered 2026-09-30
 - **R2 — Audio + Spend**: voices catalog + sync, TTS generate, multi-character TTS, voice history, **real ElevenLabs adapter** (TTS/voice-sync/SFX/voice-design/voice-clone), **Spend dashboard** (replaces billing; per-tool cost breakdown). ✅ delivered 2026-09-30
 - **R3 — Video pipelines**: bulk-videos, first-last-frame, long-video studio, bulk-images-to-video, lip-sync, UGC ads + provider adapters (Gemini first, then fal/Replicate/Together/self-hosted via the HttpApiProvider adapter). ✅ delivered 2026-09-30
-- **R4 — YouTube automation**: niche finder, SEO generator, tags, channel analyzer (+ cache).
-- **R5 — Personal platform**: API keys, AI chat/support tickets, provider registry admin (add/routing rules). Affiliate, child panels, offers: dropped (personal use).
+- **R4 — YouTube automation**: niche finder, SEO generator, tags, channel analyzer, video breakdown, master prompt (+ 24h cache, honest 503s without keys). ✅ delivered 2026-09-30
+- **R5 — Personal platform**: AI chat/support tickets, provider registry admin (add/routing rules). Affiliate, child panels, offers: dropped (personal use).
 - **R6 — Hardening**: rate limits, tests, backups, docs, admin basics.
 
 Each release is independently deployable; the static frontend already exists for all of them.

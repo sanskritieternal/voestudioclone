@@ -123,6 +123,12 @@ export interface ProviderRegistry {
   config: ColumnType<Record<string, unknown>, Record<string, unknown>, Record<string, unknown>>;
 }
 
+export interface ProviderCredentials {
+  provider_name: string;
+  api_key: string;
+  updated_at: Date;
+}
+
 export interface ProviderCostLog {
   id: Generated<string>;
   user_id: string | null;
@@ -184,6 +190,7 @@ export interface Database {
   artifacts: Artifacts;
   provider_registry: ProviderRegistry;
   provider_cost_log: ProviderCostLog;
+  provider_credentials: ProviderCredentials;
   voices: Voices;
   youtube_analyses: YoutubeAnalyses;
   api_keys: ApiKeys;

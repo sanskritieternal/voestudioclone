@@ -1,6 +1,5 @@
 import crypto from 'node:crypto';
 import { promises as fs } from 'node:fs';
-import { config } from '../../config';
 import { jobArtifactDir, downloadToFile, wrapPcmAsWav } from '../media';
 import type { CapabilityProvider, ProviderCall, ProviderHandle, ProviderPoll, NewArtifact, Capability, RegistryRow } from '../providers';
 
@@ -15,16 +14,19 @@ import type { CapabilityProvider, ProviderCall, ProviderHandle, ProviderPoll, Ne
  * adapter instead of hard-failing.
  */
 
+import { providerKey } from '../credentials';
+
 const BASE = 'https://generativelanguage.googleapis.com';
 
-function apiKey(): string {
-  const k = config.geminiApiKey;
+async function apiKey(): Promise<string> {
+  // DB credential (API Keys page) wins; GEMINI_API_KEY / GOOGLE_API_KEY env is the fallback.
+  const k = await providerKey('gemini');
   if (!k) throw Object.assign(new Error('gemini_not_configured'), { code: 'gemini_not_configured' });
   return k;
 }
 
 async function gFetch(path: string, init: RequestInit = {}): Promise<any> {
-  const url = `${BASE}${path}${path.includes('?') ? '&' : '?'}key=${encodeURIComponent(apiKey())}`;
+  const url = `${BASE}${path}${path.includes('?') ? '&' : '?'}key=${encodeURIComponent(await apiKey())}`;
   const res = await fetch(url, { ...init, headers: { 'Content-Type': 'application/json', ...(init.headers ?? {}) } });
   if (!res.ok) {
     let detail = '';
@@ -148,7 +150,7 @@ export class GeminiProvider implements CapabilityProvider {
     const uri = op.response?.generatedVideos?.[0]?.video?.uri;
     if (!uri) throw new Error('gemini_video_failed: no video uri in completed operation');
     const fileName = `video-${st.idx + 1}.mp4`;
-    await downloadToFile(uri, `${st.dir}/${fileName}`, { 'x-goog-api-key': apiKey() });
+    await downloadToFile(uri, `${st.dir}/${fileName}`, { 'x-goog-api-key': await apiKey() });
     st.artifacts.push({
       kind: 'video',
       fileName,

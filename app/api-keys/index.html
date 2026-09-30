@@ -116,6 +116,10 @@
 <pre class="prompt-block">curl -X POST https://veostudioai.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","password":"&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"}'</pre></div>
+<div class="card stagger-3 mt-4"><div class="card-header"><h3>Provider integrations</h3><span class="api-auth-badge">Server-side</span></div>
+<p class="form-hint" style="margin-bottom:12px;">Paste your provider API keys here. They are stored on your server and take precedence over <code>.env</code> values. Keys are never displayed back — only whether one is configured.</p>
+<div id="provRows"></div>
+<p class="form-hint" id="provMsg" style="margin-top:10px;"></p></div>
 
 </div>
 </main>
@@ -174,5 +178,85 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
   document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
 });
+</script>
+<script>
+(function(){
+  function apiBase(){ return (localStorage.getItem('veo_api_base')||'').replace(/\/$/,''); }
+  function token(){ return localStorage.getItem('veo_token')||''; }
+  var PROVIDERS = [
+    { id:'elevenlabs',  name:'ElevenLabs',      desc:'Text-to-speech, SFX, voice design & cloning' },
+    { id:'gemini',      name:'Google Gemini',  desc:'Veo video, Imagen images, LLM text' },
+    { id:'fal',         name:'fal.ai',         desc:'LTX, Hunyuan and other video models via queue API' },
+    { id:'replicate',   name:'Replicate',      desc:'Open video/image models via predictions API' },
+    { id:'together',    name:'Together AI',    desc:'Open image & chat models' },
+    { id:'self-hosted', name:'Self-hosted',    desc:'Your own endpoint (configured per registry row)' },
+    { id:'youtube',     name:'YouTube Data API', desc:'Channel analyzer, video breakdown, niche finder' }
+  ];
+  var rowsEl = document.getElementById('provRows');
+  var msgEl = document.getElementById('provMsg');
+  function msg(t, ok){ msgEl.textContent = t; msgEl.style.color = ok ? 'var(--text-secondary)' : '#e5484d'; }
+  function authHeaders(){ var h = {'Content-Type':'application/json'}; var t = token(); if(t) h['Authorization'] = 'Bearer '+t; return h; }
+  function statusBadge(c){
+    var label = c.configured ? ('Configured ('+c.source+')') : 'Not configured';
+    var color = c.configured ? '#22c55e' : 'var(--text-muted)';
+    return '<span style="font-size:12px;font-weight:600;color:'+color+'">'+label+'</span>';
+  }
+  function render(status){
+    var byId = {}; status.forEach(function(c){ byId[c.provider] = c; });
+    rowsEl.innerHTML = PROVIDERS.map(function(p){
+      var c = byId[p.id] || {configured:false, source:'none'};
+      return '<div class="token-row" style="margin-bottom:10px;">'
+        + '<div style="flex:1 1 200px;min-width:180px;"><div style="font-weight:600;">'+p.name+'</div>'
+        + '<div class="form-hint">'+p.desc+'</div>'
+        + '<div style="margin-top:4px;">'+statusBadge(c)+'</div></div>'
+        + '<input type="password" class="form-input" id="pk-'+p.id+'" placeholder="Paste new key to '+(c.configured?'replace':'save')+'" style="flex:2 1 260px;" autocomplete="new-password">'
+        + '<button class="btn btn-primary btn-sm" data-save="'+p.id+'">Save</button>'
+        + (c.configured ? '<button class="btn btn-ghost btn-sm" data-clear="'+p.id+'">Clear</button>' : '')
+        + '</div>';
+    }).join('');
+    rowsEl.querySelectorAll('[data-save]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var id = b.getAttribute('data-save');
+        var input = document.getElementById('pk-'+id);
+        var key = (input.value||'').trim();
+        if(key.length < 8){ msg('Key looks too short — paste the full key.', false); return; }
+        b.disabled = true;
+        fetch(apiBase()+'/api/providers/'+id+'/key', { method:'PUT', headers: authHeaders(), body: JSON.stringify({key:key}) })
+          .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
+          .then(function(res){
+            b.disabled = false;
+            if(!res.ok){ msg('Save failed: '+(res.j.error||res.j.message||'error'), false); return; }
+            input.value='';
+            msg(pName(id)+' key saved. It takes effect immediately.', true);
+            load();
+          })
+          .catch(function(e){ b.disabled = false; msg('Save failed: '+e.message, false); });
+      });
+    });
+    rowsEl.querySelectorAll('[data-clear]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var id = b.getAttribute('data-clear');
+        if(!confirm('Remove the stored '+pName(id)+' key? The .env value (if any) will be used again.')) return;
+        fetch(apiBase()+'/api/providers/'+id+'/key', { method:'DELETE', headers: authHeaders() })
+          .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
+          .then(function(res){
+            if(!res.ok){ msg('Clear failed: '+(res.j.error||'error'), false); return; }
+            msg(pName(id)+' key removed.', true);
+            load();
+          })
+          .catch(function(e){ msg('Clear failed: '+e.message, false); });
+      });
+    });
+  }
+  function pName(id){ var f = PROVIDERS.filter(function(p){return p.id===id;})[0]; return f ? f.name : id; }
+  function load(){
+    if(!token()){ rowsEl.innerHTML = '<p class="form-hint">Log in to manage provider keys.</p>'; return; }
+    fetch(apiBase()+'/api/providers', { headers: authHeaders() })
+      .then(function(r){ return r.json(); })
+      .then(function(j){ render(j.credentials || []); })
+      .catch(function(e){ rowsEl.innerHTML = '<p class="form-hint">Could not reach the API. Set the API base URL below if the backend runs elsewhere.</p>'; });
+  }
+  load();
+})();
 </script>
 </body></html>

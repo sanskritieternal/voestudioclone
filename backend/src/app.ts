@@ -15,6 +15,8 @@ import voiceRoutes from './routes/voices';
 import planRoutes from './routes/plans';
 import brandingRoutes from './routes/branding';
 import spendRoutes from './routes/spend';
+import providerRoutes from './routes/providers';
+import youtubeRoutes from './routes/youtube';
 
 export async function buildApp() {
   const app = Fastify({ logger: true });
@@ -55,6 +57,8 @@ export async function buildApp() {
   await app.register(planRoutes, { prefix: '/api/plans' });
   await app.register(brandingRoutes, { prefix: '/api/branding' });
   await app.register(spendRoutes, { prefix: '/api/spend' });
+  await app.register(providerRoutes, { prefix: '/api/providers' });
+  await app.register(youtubeRoutes, { prefix: '/api/youtube' });
 
   return app;
 }

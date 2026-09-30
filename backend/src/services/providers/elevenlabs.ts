@@ -12,17 +12,21 @@ import type { CapabilityProvider, ProviderCall, ProviderHandle, ProviderPoll, Vo
  * effects, voice design (text-to-voice) and voice cloning. Pricing notes
  * are estimates (USD) for the Spend dashboard, not invoices.
  *
- * Auth: ELEVENLABS_API_KEY env var. When the key is absent, submit()
+ * Auth: provider_credentials store (API Keys page) first, ELEVENLABS_API_KEY
+ * env as fallback. When the key is absent, submit()
  * throws `elevenlabs_not_configured` so the provider chain falls back to
  * the next adapter (stub in R1/R2) instead of hard-failing.
  */
+
+import { providerKey } from '../credentials';
 
 const DEFAULT_VOICE = '21m00Tcm4TlvDq8ikWAM'; // Rachel (classic default)
 const DEFAULT_MODEL = 'eleven_multilingual_v2';
 const COST_PER_CHAR_USD = 0.00018; // ~$0.18 / 1k chars, creator tier (estimate)
 
-function apiKey(): string {
-  const k = config.elevenlabsApiKey;
+async function apiKey(): Promise<string> {
+  // DB credential (API Keys page) wins; ELEVENLABS_API_KEY env is the fallback.
+  const k = await providerKey('elevenlabs');
   if (!k) throw Object.assign(new Error('elevenlabs_not_configured'), { code: 'elevenlabs_not_configured' });
   return k;
 }
@@ -31,7 +35,7 @@ async function elFetch(path: string, init: RequestInit & { voiceId?: string } = 
   const url = `${config.elevenlabsBase}${path}`;
   const res = await fetch(url, {
     ...init,
-    headers: { 'xi-api-key': apiKey(), ...(init.headers ?? {}) },
+    headers: { 'xi-api-key': await apiKey(), ...(init.headers ?? {}) },
   });
   if (!res.ok) {
     let detail = '';

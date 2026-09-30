@@ -100,39 +100,14 @@
 <main class="main-content fade-in">
 <div class="fade-in">
 
-<div class="page-header stagger-1"><div><h1 class="page-title">Plans</h1><p class="page-subtitle">Choose the plan that fits your creation goals</p></div>
+<div class="page-header stagger-1"><div><h1 class="page-title">Plans</h1><p class="page-subtitle">Routing profiles — pick how generations are routed and limited. Personal use, no billing.</p></div>
 <div class="page-actions"></div></div>
 <div class="card stagger-2"><div class="dash-usage-3col">
-<div class="dash-usage-card"><div class="dash-usage-count">Free</div><div class="dash-usage-title">Current Plan</div></div>
-<div class="dash-usage-card"><div class="dash-usage-count">0</div><div class="dash-usage-title">Scenes Used Today</div></div>
-<div class="dash-usage-card"><div class="dash-usage-count">0</div><div class="dash-usage-title">Days Left</div></div>
+<div class="dash-usage-card"><div class="dash-usage-count" id="curProfile">—</div><div class="dash-usage-title">Current Profile</div></div>
+<div class="dash-usage-card"><div class="dash-usage-count" id="curScenes">—</div><div class="dash-usage-title">Scenes Used Today</div></div>
+<div class="dash-usage-card"><div class="dash-usage-count" id="curThreads">—</div><div class="dash-usage-title">Parallel Threads</div></div>
 </div></div>
-<div class="plans-grid mt-4"><div class="plan-card plan-card-active stagger-3">
-<span class="plan-card-badge">Current</span>
-<div class="plan-card-header"><h3>Free</h3><div class="plan-price"><span class="plan-price-amount">Rs.0</span><span class="plan-price-period">/ day</span></div></div>
-<div class="plan-card-body"><ul class="plan-features"><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> 1 thread</li><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> 2 min max video</li><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> 1 scene / cycle</li><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Daily reset</li></ul>
-<a class="btn btn-ghost btn-block mt-3" href="#">Current Plan</a></div></div><div class="plan-card stagger-3">
-
-<div class="plan-card-header"><h3>Starter</h3><div class="plan-price"><span class="plan-price-amount">Rs.3,500</span><span class="plan-price-period">/ month</span></div></div>
-<div class="plan-card-body"><ul class="plan-features"><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Everything in Free</li><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Higher daily limits</li><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Priority queue</li></ul>
-<a class="btn btn-primary btn-block mt-3" href="#">Contact to Upgrade</a></div></div><div class="plan-card stagger-3">
-
-<div class="plan-card-header"><h3>Basic</h3><div class="plan-price"><span class="plan-price-amount">Rs.4,000</span><span class="plan-price-period">/ month</span></div></div>
-<div class="plan-card-body"><ul class="plan-features"><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Everything in Starter</li><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> More scenes per cycle</li><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Bulk tools unlocked</li></ul>
-<a class="btn btn-primary btn-block mt-3" href="#">Contact to Upgrade</a></div></div><div class="plan-card stagger-3">
-
-<div class="plan-card-header"><h3>Premium</h3><div class="plan-price"><span class="plan-price-amount">Rs.5,000</span><span class="plan-price-period">/ month</span></div></div>
-<div class="plan-card-body"><ul class="plan-features"><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Everything in Basic</li><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Long videos generator</li><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> API access</li></ul>
-<a class="btn btn-primary btn-block mt-3" href="#">Contact to Upgrade</a></div></div><div class="plan-card stagger-3">
-
-<div class="plan-card-header"><h3>Ultra Premium</h3><div class="plan-price"><span class="plan-price-amount">Rs.7,000</span><span class="plan-price-period">/ month</span></div></div>
-<div class="plan-card-body"><ul class="plan-features"><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Everything in Premium</li><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Maximum limits</li><li class="plan-feature-item"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Dedicated support</li></ul>
-<a class="btn btn-primary btn-block mt-3" href="#">Contact to Upgrade</a></div></div></div>
-<div class="card stagger-4 mt-4"><div class="card-header"><h3><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.56 3.27a.5.5 0 0 1 .88 0l2.95 5.6a1 1 0 0 0 1.52.3l4.27-3.67a.5.5 0 0 1 .8.52l-2.83 10.24a1 1 0 0 1-.96.74H5.81a1 1 0 0 1-.96-.74L2.02 6.02a.5.5 0 0 1 .8-.52l4.27 3.66a1 1 0 0 0 1.52-.29z"/><path d="M5 21h14"/></svg> Child Panel &mdash; White Label</h3></div>
-<p class="text-muted">Launch your own branded AI studio. One-time payment of <strong>Rs 20,000</strong>.</p>
-<a class="btn btn-primary mt-2" href="../child-panel/index.html">Learn More</a></div>
-
-</div>
+<div class="plans-grid mt-4" id="plansGrid"><div class="card"><p class="text-muted">Loading profiles…</p></div></div>
 </main>
 <nav class="mobile-nav"><a class="mobile-nav-item " href="/dashboard" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg> <span>Home</span></a><a class="mobile-nav-item " href="/projects" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-open" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></svg> <span>Projects</span></a><a class="mobile-nav-item " href="/projects/new" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-plus" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg> <span>Create</span></a><a aria-current="page" class="mobile-nav-item active" href="/tools" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wrench" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"></path></svg> <span>Tools</span></a></nav>
 </div>
@@ -189,5 +164,68 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
   document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
 });
+</script>
+<script>
+(function(){
+  function apiBase(){ return (localStorage.getItem('veo_api_base') || '').replace(/\/$/, ''); }
+  function token(){ return localStorage.getItem('veo_token') || ''; }
+  function headers(){ var h = { 'Content-Type': 'application/json' }; var t = token(); if (t) h['Authorization'] = 'Bearer ' + t; return h; }
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function fmt(n){ n = Number(n || 0); if (n >= 1e6) return (n/1e6).toFixed(1) + 'M'; if (n >= 1e3) return (n/1e3).toFixed(1) + 'K'; return String(n); }
+  var CHECK = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
+  function feature(t){ return '<li class="plan-feature-item">' + CHECK + ' ' + esc(t) + '</li>'; }
+  function card(p, currentId){
+    var l = p.limits || {}, f = p.features || {};
+    var isCur = p.id === currentId;
+    var h = '<div class="plan-card stagger-3' + (isCur ? ' plan-card-active' : '') + '">';
+    if (isCur) h += '<span class="plan-card-badge">Current</span>';
+    h += '<div class="plan-card-header"><h3>' + esc(p.name) + '</h3><div class="plan-price"><span class="plan-price-amount">'
+      + (p.id.indexOf('eco') >= 0 ? 'Cost saver' : 'Best quality') + '</span></div></div>';
+    h += '<div class="plan-card-body"><ul class="plan-features">'
+      + feature(l.threads + ' parallel threads')
+      + feature(fmt(l.scenes_daily) + ' scenes / day')
+      + feature(fmt(l.images_daily) + ' images / day')
+      + feature(fmt(l.tts_chars_daily) + ' TTS chars / day')
+      + feature(l.max_video_minutes + ' min max video length')
+      + feature(fmt(l.niche_analyses_daily) + ' YouTube analyses / day')
+      + (f.priority_queue ? feature('Priority queue') : '')
+      + (f.bulk_tools ? feature('Bulk tools unlocked') : '')
+      + (f.api_access ? feature('API access') : '')
+      + '</ul>';
+    if (isCur) h += '<span class="btn btn-ghost btn-block mt-3">Current Profile</span>';
+    else h += '<button class="btn btn-primary btn-block mt-3" data-switch="' + esc(p.id) + '">Switch to this profile</button>';
+    return h + '</div></div>';
+  }
+  function load(){
+    if (!token()) { document.getElementById('plansGrid').innerHTML = '<div class="card"><p>Log in to see your routing profiles.</p></div>'; return; }
+    Promise.all([
+      fetch(apiBase() + '/api/auth/me', { headers: headers() }).then(function(r){ return r.json(); }),
+      fetch(apiBase() + '/api/plans', { headers: headers() }).then(function(r){ return r.json(); })
+    ]).then(function(res){
+      var me = res[0], plans = (res[1] && res[1].plans) || [];
+      var curId = me.plan && me.plan.id;
+      document.getElementById('curProfile').textContent = (me.plan && me.plan.name) || '—';
+      document.getElementById('curThreads').textContent = (me.plan && me.plan.limits && me.plan.limits.threads) || '—';
+      var sc = me.quotas && me.quotas.scenes;
+      document.getElementById('curScenes').textContent = sc ? (sc.used + ' / ' + sc.limit) : '—';
+      document.getElementById('plansGrid').innerHTML = plans.map(function(p){ return card(p, curId); }).join('');
+      document.querySelectorAll('[data-switch]').forEach(function(b){
+        b.addEventListener('click', function(){
+          b.disabled = true; b.textContent = 'Switching…';
+          fetch(apiBase() + '/api/plans/' + encodeURIComponent(b.getAttribute('data-switch')) + '/switch', { method: 'POST', headers: headers() })
+            .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); })
+            .then(function(r2){
+              if (r2.ok) { window.toast ? toast('Switched to ' + r2.j.name) : alert('Switched'); load(); }
+              else { alert(r2.j.message || 'Switch failed'); b.disabled = false; b.textContent = 'Switch to this profile'; }
+            })
+            .catch(function(){ b.disabled = false; b.textContent = 'Switch to this profile'; });
+        });
+      });
+    }).catch(function(e){
+      document.getElementById('plansGrid').innerHTML = '<div class="card"><p>Could not load profiles: ' + esc(e.message) + '</p></div>';
+    });
+  }
+  load();
+})();
 </script>
 </body></html>

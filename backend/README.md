@@ -1,6 +1,18 @@
-# VEO Studio Backend — R3 Video Adapters
+# VEO Studio Backend — R4 YouTube Automation
 
 Fastify + Postgres + Redis/BullMQ. See `../docs/backend-blueprint.md` for the full design.
+
+## R4 scope (delivered)
+
+- **YouTube automation API** (`/api/youtube`): niche finder (search ordered by viewCount → avg/median views, competition heuristic, opportunity score), channel analyzer (stats + 30-day activity + top 10 recent videos), video breakdown (metadata, tags, description), SEO generator, tags generator, master prompt (all three LLM-generated via the provider chain — no fabricated output). Handles (`@handle`) resolve to channel IDs. Results cached per user for 24h (`youtube_analyses`); history list/view/delete endpoints.
+- **Honest failures**: without a YouTube Data API key → `503 youtube_not_configured`; without an LLM key → `503 llm_not_configured` (the LLM tools refuse to fabricate SEO/tags); bad key / upstream error → `502` with the real provider message. Frontend links straight to the API Keys page.
+- **Quota fairness**: charged to the existing `niche_analyses` daily dimension; cache hits and validation/config failures cost nothing (quota reserved only on cache miss, released via `releaseQuota` when the request never touched the upstream); a 25s timeout bounds hung YouTube calls.
+- **Frontend**: the 7 YouTube tool pages are live against the API (shared `app/assets/js/yt-tools.js`), incl. the history page with search/filter/view/delete.
+- Smoke-tested: error paths (503/502/400/404/429-shape), credential set/clear/status (values never leak), quota charging/release, plan switching, history CRUD. A full success-path test needs real YouTube + Gemini keys.
+
+## Provider credentials (UI-managed keys)
+
+Provider API keys no longer have to live in env vars. The **API Keys page → Provider integrations** section (backed by `provider_credentials`, migration 007, `PUT/DELETE /api/providers/:name/key`) stores keys per provider in Postgres; `GET /api/providers` reports configured/source (`db|env|none`) but never values. Resolution order: **DB value wins, env var is the fallback**. All adapters (ElevenLabs, Gemini, fal/Replicate/Together/self-hosted, YouTube) resolve keys through `providerKey()` — existing env deployments keep working unchanged.
 
 ## R3 scope (delivered)
 
@@ -72,4 +84,4 @@ curl -s localhost:8080/api/jobs/$JOB -H "Authorization: Bearer $TOKEN"
 ## What's stubbed (honest list)
 
 - Video/image providers are still `StubProvider` (no real Gemini/fal/Replicate/Together calls yet). TTS has the real ElevenLabs adapter but falls back to stub until `ELEVENLABS_API_KEY` is set. Artifacts are clearly marked `stub:true` in their meta.
-- YouTube automation tools → R4. API keys management, AI chat, support tickets → R5.
+- YouTube automation tools → R4 ✅ delivered. API keys management (UI provider-key store) → R4 ✅ delivered. AI chat, support tickets → R5.
