@@ -29,6 +29,9 @@ export const config = {
   artifactDir: opt('ARTIFACT_DIR', '/data/artifacts'),
   providerMode: opt('PROVIDER_MODE', 'stub') as 'stub' | 'live',
   workerConcurrency: num('WORKER_CONCURRENCY', 4),
+  // R2: ElevenLabs (native TTS transport). Empty = adapter falls back to the next provider in the chain.
+  elevenlabsApiKey: opt('ELEVENLABS_API_KEY', ''),
+  elevenlabsBase: opt('ELEVENLABS_BASE_URL', 'https://api.elevenlabs.io'),
 };
 
 if (config.nodeEnv === 'production' && config.jwtSecret.length < 32) {

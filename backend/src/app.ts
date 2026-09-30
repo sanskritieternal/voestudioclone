@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import fastifyJwt from '@fastify/jwt';
 import fastifyStatic from '@fastify/static';
+import multipart from '@fastify/multipart';
 import { promises as fs } from 'node:fs';
 import { config } from './config';
 import { authedLimiter } from './middleware/rateLimit';
@@ -13,12 +14,14 @@ import toolRoutes from './routes/tools';
 import voiceRoutes from './routes/voices';
 import planRoutes from './routes/plans';
 import brandingRoutes from './routes/branding';
+import spendRoutes from './routes/spend';
 
 export async function buildApp() {
   const app = Fastify({ logger: true });
 
   await app.register(cors, { origin: true });
   await app.register(fastifyJwt, { secret: config.jwtSecret });
+  await app.register(multipart, { limits: { fileSize: 10 * 1024 * 1024, files: 25, fields: 20 } });
 
   app.decorate('authenticate', async (req, reply) => {
     try {
@@ -51,6 +54,7 @@ export async function buildApp() {
   await app.register(voiceRoutes, { prefix: '/api/voices' });
   await app.register(planRoutes, { prefix: '/api/plans' });
   await app.register(brandingRoutes, { prefix: '/api/branding' });
+  await app.register(spendRoutes, { prefix: '/api/spend' });
 
   return app;
 }

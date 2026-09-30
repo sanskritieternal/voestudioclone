@@ -4,12 +4,14 @@ import * as m001 from './db/migrations/001_core';
 import * as m002 from './db/migrations/002_jobs';
 import * as m003 from './db/migrations/003_providers';
 import * as m004 from './db/migrations/004_seed';
+import * as m005 from './db/migrations/005_r2';
 
 const MIGRATIONS: Array<{ name: string; up: (db: Kysely<any>) => Promise<void> }> = [
   { name: '001_core', up: m001.up },
   { name: '002_jobs', up: m002.up },
   { name: '003_providers', up: m003.up },
   { name: '004_seed', up: m004.up },
+  { name: '005_r2', up: m005.up },
 ];
 
 async function migrate(): Promise<void> {

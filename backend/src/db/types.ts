@@ -129,6 +129,7 @@ export interface ProviderCostLog {
   job_id: string | null;
   provider: string;
   capability: string;
+  tool: string | null;
   units: number;
   cost_estimate: number | null;
   created_at: Generated<Date>;

@@ -1,5 +1,6 @@
 import { db, closeDb } from './db';
 import { hashPassword } from './services/auth';
+import { syncElevenLabsVoices } from './services/providers/elevenlabs';
 
 function parseArgs(argv: string[]): Record<string, string> {
   const out: Record<string, string> = {};
@@ -38,8 +39,20 @@ async function main(): Promise<void> {
       .returning(['id', 'email', 'plan_id'])
       .executeTakeFirstOrThrow();
     console.log(`created user ${row.email} (id=${row.id}, plan=${row.plan_id})`);
+  } else if (cmd === 'sync-voices') {
+    // Pull the ElevenLabs voice catalog into the voices table (powers GET /api/voices).
+    try {
+      const res = await syncElevenLabsVoices();
+      console.log(`synced voices: fetched=${res.fetched} upserted=${res.upserted}`);
+    } catch (err: any) {
+      console.error(`sync-voices failed: ${err?.message ?? String(err)}`);
+      if (err?.code === 'elevenlabs_not_configured') {
+        console.error('hint: set ELEVENLABS_API_KEY in backend/.env to use the real catalog (stub voices stay until then).');
+      }
+      process.exit(1);
+    }
   } else {
-    console.error(`unknown command "${cmd}". available: create-user`);
+    console.error(`unknown command "${cmd}". available: create-user, sync-voices`);
     process.exit(1);
   }
 

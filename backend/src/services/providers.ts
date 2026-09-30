@@ -1,7 +1,8 @@
 import crypto from 'node:crypto';
 import { db } from '../db';
 import { config } from '../config';
-import { jobArtifactDir, writeSlateSvg, writeSilentWav } from './media';
+import { jobArtifactDir, writeSlateSvg, writeSilentWav, writeToneWav, wrapPcmAsWav } from './media';
+import { ElevenLabsTtsProvider } from './providers/elevenlabs';
 
 /**
  * Provider abstraction (blueprint §5.4).
@@ -47,8 +48,41 @@ export interface CapabilityProvider {
   poll(handle: ProviderHandle, call: ProviderCall): Promise<ProviderPoll>;
 }
 
+/**
+ * Optional voice-lab surface (R2). Implemented by providers that support
+ * segment synthesis (multi-character TTS), sound effects, voice design
+ * and voice cloning. The worker's voice tools use the first chain
+ * provider that implements it.
+ */
+export interface VoiceLab {
+  synthSegment(text: string, voiceId: string | undefined, outPath: string): Promise<{ chars: number; costEstimate: number }>;
+  generateSfx(prompt: string, seconds: number, outPath: string): Promise<{ costEstimate: number }>;
+  designVoice(p: { name: string; description: string; text: string }, outPath: string): Promise<{ designId: string | null; costEstimate: number }>;
+  cloneVoice(p: {
+    name: string;
+    description?: string;
+    labels?: Record<string, string>;
+    files: Array<{ filename: string; data: Buffer; contentType: string }>;
+  }): Promise<{ voiceId: string }>;
+}
+
+export function asVoiceLab(p: CapabilityProvider): VoiceLab | null {
+  return 'synthSegment' in p ? (p as unknown as VoiceLab) : null;
+}
+
+/**
+ * Fallback semantics (R2): a provider that is not configured (no API key)
+ * yields to the next provider in the chain — this is the "keys are still
+ * being configured" state. Any other error (bad key, 4xx/5xx, timeout) is
+ * fatal for the chain: the job fails loudly instead of silently producing
+ * stub artifacts that look like real output.
+ */
+export function isNotConfiguredError(err: any): boolean {
+  return !!err?.code && String(err.code).endsWith('_not_configured');
+}
+
 /** Local fake: completes after a few seconds, writes viewable stub artifacts. */
-export class StubProvider implements CapabilityProvider {
+export class StubProvider implements CapabilityProvider, VoiceLab {
   readonly name = 'stub';
   constructor(readonly capability: Capability) {}
 
@@ -67,9 +101,10 @@ export class StubProvider implements CapabilityProvider {
 
     if (call.capability === 'tts') {
       const text = String(call.params.text ?? '');
+      const prefix = String(call.params.artifact_prefix ?? 'tts');
       const seconds = Math.min(120, Math.max(2, Math.round(text.length / 14)));
-      await writeSilentWav(`${dir}/tts.wav`, seconds);
-      artifacts.push({ kind: 'audio', fileName: 'tts.wav', meta: { stub: true, seconds, chars: text.length } });
+      await writeSilentWav(`${dir}/${prefix}.wav`, seconds);
+      artifacts.push({ kind: 'audio', fileName: `${prefix}.wav`, meta: { stub: true, seconds, chars: text.length } });
       void urlPrefix;
     } else {
       const prompts = Array.isArray(call.params.prompts) ? (call.params.prompts as unknown[]) : [];
@@ -86,6 +121,28 @@ export class StubProvider implements CapabilityProvider {
     }
     return { status: 'completed', artifacts, costEstimate: 0 };
   }
+
+  // ---- VoiceLab (stub): audible tone files so the pipeline stays testable ----
+  async synthSegment(text: string, _voiceId: string | undefined, outPath: string): Promise<{ chars: number; costEstimate: number }> {
+    const seconds = Math.min(60, Math.max(1, Math.round(text.length / 14)));
+    await writeSilentWav(outPath, seconds);
+    return { chars: text.length, costEstimate: 0 };
+  }
+
+  async generateSfx(prompt: string, seconds: number, outPath: string): Promise<{ costEstimate: number }> {
+    await writeToneWav(outPath, Math.min(30, Math.max(1, seconds)), 440 + (prompt.length % 400));
+    return { costEstimate: 0 };
+  }
+
+  async designVoice(p: { name: string; description: string; text: string }, outPath: string): Promise<{ designId: string | null; costEstimate: number }> {
+    await writeToneWav(outPath, 6, 330);
+    return { designId: `stub-design-${crypto.randomUUID().slice(0, 8)}`, costEstimate: 0 };
+  }
+
+  async cloneVoice(p: { name: string; description?: string; files: Array<{ filename: string; data: Buffer; contentType: string }> }): Promise<{ voiceId: string }> {
+    void p;
+    return { voiceId: `stub-${crypto.randomUUID().slice(0, 12)}` };
+  }
 }
 
 export interface RegistryRow {
@@ -95,28 +152,42 @@ export interface RegistryRow {
   transport: string;
   priority: number;
   enabled: boolean;
+  default_model: string | null;
+  config: Record<string, unknown>;
 }
 
 /**
  * Resolve the provider chain for a capability. In stub mode (R1) this
  * always yields a StubProvider; in live mode it instantiates adapters
- * for enabled registry rows ordered by priority (R2/R3).
+ * for enabled registry rows ordered by priority, skipping rows whose
+ * adapter has not landed yet (their adapters are noted in the logs).
+ * When nothing live can be instantiated, the stub is kept as the final
+ * fallback so the pipeline never hard-fails while keys are configured.
  */
 export async function resolveProviders(capability: Capability, _tool: string): Promise<CapabilityProvider[]> {
   if (config.providerMode === 'stub') return [new StubProvider(capability)];
 
   const rows = (await db
     .selectFrom('provider_registry')
-    .select(['id', 'name', 'capability', 'transport', 'priority', 'enabled'])
+    .select(['id', 'name', 'capability', 'transport', 'priority', 'enabled', 'default_model', 'config'])
     .where('capability', '=', capability)
     .where('enabled', '=', true)
     .orderBy('priority', 'asc')
     .execute()) as RegistryRow[];
 
-  // Live adapters plug in here (R2/R3). Until then, fall back to stub so the
-  // pipeline never hard-fails while keys are being configured.
-  if (rows.length === 0) return [new StubProvider(capability)];
-  return [new StubProvider(capability)];
+  const chain: CapabilityProvider[] = [];
+  for (const row of rows) {
+    if (row.name === 'elevenlabs' && capability === 'tts') {
+      chain.push(new ElevenLabsTtsProvider(row.default_model ?? 'eleven_multilingual_v2'));
+    } else {
+      // Adapter not implemented yet (Gemini lands in R3, fal/Replicate/Together/self-hosted later).
+      console.warn(`provider row "${row.id}" has no adapter yet; skipping`);
+    }
+  }
+  // The stub stays as the final fallback so unconfigured providers degrade
+  // gracefully; see isNotConfiguredError for when the chain yields vs fails.
+  chain.push(new StubProvider(capability));
+  return chain;
 }
 
 export async function listRegistry(): Promise<RegistryRow[]> {

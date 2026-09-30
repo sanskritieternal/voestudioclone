@@ -9,7 +9,11 @@ export const db = new Kysely<Database>({
   dialect: new PostgresDialect({ pool }),
 });
 
+let closed = false;
 export async function closeDb(): Promise<void> {
+  if (closed) return;
+  closed = true;
+  // Kysely's destroy() ends the pool via the PostgresDialect driver;
+  // calling pool.end() as well logs "Called end on pool more than once".
   await db.destroy();
-  await pool.end();
 }

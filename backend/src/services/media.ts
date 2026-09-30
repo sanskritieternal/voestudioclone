@@ -42,6 +42,97 @@ function escapeXml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/** Write a WAV header for raw 16-bit PCM samples. */
+export async function wrapPcmAsWav(filePath: string, pcm: Buffer, sampleRate: number, channels: number): Promise<void> {
+  const dataSize = pcm.length;
+  const header = Buffer.alloc(44);
+  header.write('RIFF', 0);
+  header.writeUInt32LE(36 + dataSize, 4);
+  header.write('WAVE', 8);
+  header.write('fmt ', 12);
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20); // PCM
+  header.writeUInt16LE(channels, 22);
+  header.writeUInt32LE(sampleRate, 24);
+  header.writeUInt32LE(sampleRate * channels * 2, 28);
+  header.writeUInt16LE(channels * 2, 32);
+  header.writeUInt16LE(16, 34);
+  header.write('data', 36);
+  header.writeUInt32LE(dataSize, 40);
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, Buffer.concat([header, pcm]));
+}
+
+interface WavInfo {
+  sampleRate: number;
+  channels: number;
+  bits: number;
+  dataOffset: number;
+  dataSize: number;
+}
+
+function readWavInfo(buf: Buffer): WavInfo {
+  if (buf.toString('ascii', 0, 4) !== 'RIFF' || buf.toString('ascii', 8, 12) !== 'WAVE') {
+    throw new Error('not_a_wav');
+  }
+  const channels = buf.readUInt16LE(22);
+  const sampleRate = buf.readUInt32LE(24);
+  const bits = buf.readUInt16LE(34);
+  // find the 'data' chunk (skip any extra chunks)
+  let off = 12;
+  while (off + 8 <= buf.length) {
+    const id = buf.toString('ascii', off, off + 4);
+    const size = buf.readUInt32LE(off + 4);
+    if (id === 'data') return { sampleRate, channels, bits, dataOffset: off + 8, dataSize: size };
+    off += 8 + size;
+  }
+  throw new Error('wav_no_data_chunk');
+}
+
+/** Concatenate WAV files with identical format into one file. Used by multi-character TTS. */
+export async function concatWavFiles(inputs: string[], output: string): Promise<{ seconds: number }> {
+  if (inputs.length === 0) throw new Error('concat_no_inputs');
+  const bufs = await Promise.all(inputs.map((p) => fs.readFile(p)));
+  const infos = bufs.map(readWavInfo);
+  const first = infos[0];
+  for (const i of infos) {
+    if (i.sampleRate !== first.sampleRate || i.channels !== first.channels || i.bits !== first.bits) {
+      throw new Error('concat_format_mismatch');
+    }
+  }
+  const parts = bufs.map((b, n) => b.subarray(infos[n].dataOffset, infos[n].dataOffset + infos[n].dataSize));
+  const data = Buffer.concat(parts);
+  const header = Buffer.alloc(44);
+  header.write('RIFF', 0);
+  header.writeUInt32LE(36 + data.length, 4);
+  header.write('WAVE', 8);
+  header.write('fmt ', 12);
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20);
+  header.writeUInt16LE(first.channels, 22);
+  header.writeUInt32LE(first.sampleRate, 24);
+  header.writeUInt32LE((first.sampleRate * first.channels * first.bits) / 8, 28);
+  header.writeUInt16LE((first.channels * first.bits) / 8, 32);
+  header.writeUInt16LE(first.bits, 34);
+  header.write('data', 36);
+  header.writeUInt32LE(data.length, 40);
+  await fs.mkdir(path.dirname(output), { recursive: true });
+  await fs.writeFile(output, Buffer.concat([header, data]));
+  return { seconds: data.length / ((first.sampleRate * first.channels * first.bits) / 8) };
+}
+
+/** Write a sine-tone WAV (audible stub for SFX / voice-design previews). */
+export async function writeToneWav(filePath: string, seconds: number, freqHz = 440): Promise<void> {
+  const sampleRate = 16000;
+  const n = Math.max(1, Math.floor(sampleRate * seconds));
+  const pcm = Buffer.alloc(n * 2);
+  for (let i = 0; i < n; i++) {
+    const v = Math.round(12000 * Math.sin((2 * Math.PI * freqHz * i) / sampleRate));
+    pcm.writeInt16LE(v, i * 2);
+  }
+  await wrapPcmAsWav(filePath, pcm, sampleRate, 1);
+}
+
 /** Absolute dir for a job's artifacts; also returns the URL prefix. */
 export async function jobArtifactDir(userId: string, jobId: string): Promise<{ dir: string; urlPrefix: string }> {
   const dir = path.join(config.artifactDir, userId, jobId);

@@ -3,7 +3,8 @@ import { createRedis } from './redis';
 import { config } from './config';
 import { db, closeDb } from './db';
 import { QUEUE_NAMES, type QueueName } from './queues';
-import { resolveProviders, type Capability, type NewArtifact } from './services/providers';
+import { resolveProviders, type Capability, type NewArtifact, isNotConfiguredError } from './services/providers';
+import { runMultiCharTts, runVoiceDesign, runVoiceClone, cleanupUploadDir } from './services/voiceTools';
 import { logCost } from './services/cost';
 import { releaseQuota, reconcileUsage } from './services/quota';
 
@@ -17,7 +18,7 @@ async function updateProgress(jobId: string, progress: number): Promise<void> {
   await db.updateTable('jobs').set({ progress, updated_at: new Date() }).where('id', '=', jobId).execute();
 }
 
-async function completeJob(jobId: string, userId: string, providerName: string, artifacts: NewArtifact[], costEstimate: number | null): Promise<void> {
+async function completeJob(jobId: string, userId: string, providerName: string, artifacts: NewArtifact[], costEstimate: number | null, tool?: string | null): Promise<void> {
   const urlPrefix = `/artifacts/${userId}/${jobId}`;
   const urls: string[] = [];
   for (const a of artifacts) {
@@ -35,7 +36,7 @@ async function completeJob(jobId: string, userId: string, providerName: string, 
     .execute();
   const job = await db.selectFrom('jobs').select(['capability', 'quota_reserved']).where('id', '=', jobId).executeTakeFirstOrThrow();
   const units = Object.values((job.quota_reserved as Record<string, number> | null) ?? {}).reduce((s, v) => s + (v || 0), 0);
-  await logCost({ userId, jobId, provider: providerName, capability: job.capability, units, costEstimate });
+  await logCost({ userId, jobId, provider: providerName, capability: job.capability, tool: tool ?? null, units, costEstimate });
   await reconcileUsage(userId, job.quota_reserved as Record<string, number> | null);
 }
 
@@ -71,6 +72,56 @@ async function processJob(bjob: Job<WorkerData>): Promise<void> {
   };
 
   const providers = await resolveProviders(capability, rec.tool);
+
+  // R2 voice-lab tools: walk the provider chain via the VoiceLab surface.
+  const params = (rec.params as Record<string, unknown>) ?? {};
+  if (rec.tool === 'multi-character-tts') {
+    const res = await runMultiCharTts({
+      userId: rec.user_id,
+      jobId: rec.id,
+      segments: (params.segments as Array<{ voice_id?: string; text: string }>) ?? [],
+      providers,
+      onProgress: (p) => void updateProgress(rec.id, p).catch(() => undefined),
+    });
+    await completeJob(rec.id, rec.user_id, res.provider, res.artifacts, res.costEstimate, rec.tool);
+    return;
+  }
+  if (rec.tool === 'voice-design') {
+    const res = await runVoiceDesign({
+      userId: rec.user_id,
+      jobId: rec.id,
+      name: String(params.name ?? 'Untitled Voice'),
+      description: String(params.description ?? ''),
+      text: String(params.text ?? ''),
+      providers,
+    });
+    await completeJob(rec.id, rec.user_id, res.provider, res.artifacts, res.costEstimate, rec.tool);
+    return;
+  }
+  if (rec.tool === 'voice-clone') {
+    const uploadDir = String(params.upload_dir ?? '');
+    try {
+      const res = await runVoiceClone({
+        userId: rec.user_id,
+        name: String(params.name ?? 'Cloned Voice'),
+        description: String(params.description ?? ''),
+        labels: (params.labels as Record<string, string>) ?? {},
+        uploadDir,
+        providers,
+      });
+      await db
+        .updateTable('jobs')
+        .set({ status: 'completed', progress: 100, result: { voice_id: res.voiceId, provider: res.provider }, updated_at: new Date() })
+        .where('id', '=', rec.id)
+        .execute();
+      await logCost({ userId: rec.user_id, jobId: rec.id, provider: res.provider, capability, tool: rec.tool, units: Number(params.file_count ?? 0), costEstimate: 0 });
+      await reconcileUsage(rec.user_id, rec.quota_reserved as Record<string, number> | null);
+    } finally {
+      await cleanupUploadDir(uploadDir);
+    }
+    return;
+  }
+
   let lastError = 'no provider available';
   for (const p of providers) {
     try {
@@ -90,6 +141,8 @@ async function processJob(bjob: Job<WorkerData>): Promise<void> {
         throw new Error(res.error);
       }
     } catch (err: any) {
+      // Unconfigured providers yield to the chain; real failures are fatal.
+      if (!isNotConfiguredError(err)) throw err;
       lastError = err?.message ?? String(err);
     }
   }
@@ -118,7 +171,10 @@ async function main(): Promise<void> {
     workers.push(worker);
   }
 
+  let shuttingDown = false;
   const shutdown = async () => {
+    if (shuttingDown) return;
+    shuttingDown = true;
     console.log('shutting down workers…');
     for (const w of workers) await w.close();
     await closeDb();
