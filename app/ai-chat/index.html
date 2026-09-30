@@ -105,7 +105,7 @@
 <div class="chat-layout stagger-2">
 <div class="chat-sidebar card"><div class="card-header"><h3>Recent Chats</h3></div><div class="empty-state"><p>No chats yet</p></div>
 <div class="form-group mt-3"><label class="form-label">Mode</label><div class="chip-row"><button class="chip active">Creative</button><button class="chip">Professional</button><button class="chip">Friendly</button></div></div>
-<label class="toggle-row"><span>Voice Replies</span><button type="button" class="theme-toggle" data-theme-toggle><span class="theme-toggle-thumb"></span></button></label>
+<label class="toggle-row"><span>Voice Replies</span><button type="button" class="switch" data-switch aria-pressed="false"><span class="switch-thumb"></span></button></label>
 <button class="btn btn-secondary btn-sm btn-block mt-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg> AI Settings</button></div>
 <div class="chat-main card"><div class="chat-messages"><div class="chat-empty"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><h3>Start a conversation</h3><p class="text-muted">Ask anything about the platform.</p>
 <div class="chip-row" style="justify-content:center;"><button class="chip">Video ideas</button><button class="chip">Plan limits</button><button class="chip">API help</button></div></div></div>
@@ -118,12 +118,20 @@
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // theme toggle
-  var toggles = document.querySelectorAll('[data-theme-toggle]');
-  function setTheme(t){ document.documentElement.setAttribute('data-theme', t); document.body.setAttribute('data-theme', t); try{localStorage.setItem('veo-theme', t);}catch(e){} toggles.forEach(function(el){ el.classList.toggle('on', t==='dark'); }); }
+  // theme toggle (real sidebar button + any [data-theme-toggle])
+  var toggles = document.querySelectorAll('.theme-toggle, [data-theme-toggle]');
+  function setTheme(t){ document.documentElement.setAttribute('data-theme', t); document.body.setAttribute('data-theme', t); try{localStorage.setItem('veo-theme', t);}catch(e){} toggles.forEach(function(el){ el.classList.toggle('on', t==='dark'); var tr = el.querySelector('.theme-toggle-track'); if(tr) tr.classList.toggle('active', t==='dark'); }); }
   var saved = null; try{ saved = localStorage.getItem('veo-theme'); }catch(e){}
   if (saved) setTheme(saved);
   toggles.forEach(function(el){ el.addEventListener('click', function(){ setTheme(document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark'); }); });
+  // generic switches (Auto Prompt Refine etc.) - visual only, no theme side effects
+  document.querySelectorAll('[data-switch]').forEach(function(sw){
+    sw.addEventListener('click', function(){
+      var on = sw.getAttribute('aria-pressed') === 'true';
+      sw.setAttribute('aria-pressed', on ? 'false' : 'true');
+      sw.classList.toggle('on', !on);
+    });
+  });
   // sidebar collapse
   var sb = document.querySelector('.sidebar');
   document.querySelectorAll('[data-collapse]').forEach(function(el){ el.addEventListener('click', function(){ if(sb) sb.classList.toggle('sidebar-collapsed'); document.body.classList.toggle('sidebar-is-collapsed'); }); });

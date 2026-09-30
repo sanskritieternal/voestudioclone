@@ -40,12 +40,20 @@ def fix_assets(s, rel):
 
 JS = """
 document.addEventListener('DOMContentLoaded', function() {
-  // theme toggle
-  var toggles = document.querySelectorAll('[data-theme-toggle]');
-  function setTheme(t){ document.documentElement.setAttribute('data-theme', t); document.body.setAttribute('data-theme', t); try{localStorage.setItem('veo-theme', t);}catch(e){} toggles.forEach(function(el){ el.classList.toggle('on', t==='dark'); }); }
+  // theme toggle (real sidebar button + any [data-theme-toggle])
+  var toggles = document.querySelectorAll('.theme-toggle, [data-theme-toggle]');
+  function setTheme(t){ document.documentElement.setAttribute('data-theme', t); document.body.setAttribute('data-theme', t); try{localStorage.setItem('veo-theme', t);}catch(e){} toggles.forEach(function(el){ el.classList.toggle('on', t==='dark'); var tr = el.querySelector('.theme-toggle-track'); if(tr) tr.classList.toggle('active', t==='dark'); }); }
   var saved = null; try{ saved = localStorage.getItem('veo-theme'); }catch(e){}
   if (saved) setTheme(saved);
   toggles.forEach(function(el){ el.addEventListener('click', function(){ setTheme(document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark'); }); });
+  // generic switches (Auto Prompt Refine etc.) - visual only, no theme side effects
+  document.querySelectorAll('[data-switch]').forEach(function(sw){
+    sw.addEventListener('click', function(){
+      var on = sw.getAttribute('aria-pressed') === 'true';
+      sw.setAttribute('aria-pressed', on ? 'false' : 'true');
+      sw.classList.toggle('on', !on);
+    });
+  });
   // sidebar collapse
   var sb = document.querySelector('.sidebar');
   document.querySelectorAll('[data-collapse]').forEach(function(el){ el.addEventListener('click', function(){ if(sb) sb.classList.toggle('sidebar-collapsed'); document.body.classList.toggle('sidebar-is-collapsed'); }); });
@@ -446,7 +454,7 @@ add("tools/video-studio","Long Videos Generator","Create long-form AI videos sce
 <div class="form-group"><label class="form-label">CC Mode</label><select class="form-select"><option>Off</option><option>On</option></select></div>
 </div>
 <div class="form-group"><label class="form-label">Character Consistency</label><select class="form-select"><option>Off</option><option>On</option></select></div>
-<label class="toggle-row"><span>Auto Prompt Refine</span><button type="button" class="theme-toggle" data-theme-toggle><span class="theme-toggle-thumb"></span></button></label>
+<label class="toggle-row"><span>Auto Prompt Refine</span><button type="button" class="switch" data-switch aria-pressed="false"><span class="switch-thumb"></span></button></label>
 {aspect_row()}
 <p class="form-hint">{ic("zap",14)} Frame Extender lets you extend scenes beyond the base duration.</p>
 <p class="text-muted text-sm">Daily Scenes: <strong>0 / 1</strong></p>
@@ -466,7 +474,7 @@ add("tools/bulk-videos","Bulk Videos Generator","Generate many videos from one i
 <div class="form-group"><label class="form-label">Video Style</label><select class="form-select">
 <option>Cinematic</option><option>Realistic</option><option>Anime</option><option disabled>Locked &mdash; upgrade</option></select></div>
 </div>
-<label class="toggle-row"><span>Auto Prompt Refine</span><button type="button" class="theme-toggle" data-theme-toggle><span class="theme-toggle-thumb"></span></button></label>
+<label class="toggle-row"><span>Auto Prompt Refine</span><button type="button" class="switch" data-switch aria-pressed="false"><span class="switch-thumb"></span></button></label>
 {aspect_row()}
 <div class="form-group"><label class="form-label">CC Mode / Character Consistency</label><select class="form-select"><option>Off</option><option>On</option></select></div>
 <div class="form-group"><label class="form-label">Prompts <span class="text-muted">(0/100)</span></label>
@@ -508,7 +516,7 @@ add("tools/bulk-images-to-video","Bulk Images to Video","Numbered images with ma
 <div class="form-group"><label class="form-label">Bulk Prompts</label>
 <div class="radio-row"><label class="radio-pill"><input type="radio" name="pmode" checked> Textbox</label><label class="radio-pill"><input type="radio" name="pmode"> Upload .txt</label></div>
 <textarea class="form-textarea" rows="5" placeholder="Prompt 1: ...&#10;Prompt 2: ..."></textarea></div>
-<label class="toggle-row"><span>Studio Project</span><button type="button" class="theme-toggle" data-theme-toggle><span class="theme-toggle-thumb"></span></button></label>
+<label class="toggle-row"><span>Studio Project</span><button type="button" class="switch" data-switch aria-pressed="false"><span class="switch-thumb"></span></button></label>
 {model_picker()}
 {aspect_row()}
 {gen_btn("Generate Videos")}
@@ -836,7 +844,7 @@ add("ai-chat","AI Chat","Your AI assistant","app","/ai-chat", f"""
 <div class="chat-layout stagger-2">
 <div class="chat-sidebar card"><div class="card-header"><h3>Recent Chats</h3></div><div class="empty-state"><p>No chats yet</p></div>
 <div class="form-group mt-3"><label class="form-label">Mode</label><div class="chip-row"><button class="chip active">Creative</button><button class="chip">Professional</button><button class="chip">Friendly</button></div></div>
-<label class="toggle-row"><span>Voice Replies</span><button type="button" class="theme-toggle" data-theme-toggle><span class="theme-toggle-thumb"></span></button></label>
+<label class="toggle-row"><span>Voice Replies</span><button type="button" class="switch" data-switch aria-pressed="false"><span class="switch-thumb"></span></button></label>
 <button class="btn btn-secondary btn-sm btn-block mt-2">{ic("book",16)} AI Settings</button></div>
 <div class="chat-main card"><div class="chat-messages"><div class="chat-empty">{ic("msg",40)}<h3>Start a conversation</h3><p class="text-muted">Ask anything about the platform.</p>
 <div class="chip-row" style="justify-content:center;"><button class="chip">Video ideas</button><button class="chip">Plan limits</button><button class="chip">API help</button></div></div></div>
