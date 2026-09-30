@@ -17,6 +17,8 @@ import brandingRoutes from './routes/branding';
 import spendRoutes from './routes/spend';
 import providerRoutes from './routes/providers';
 import youtubeRoutes from './routes/youtube';
+import aiChatRoutes from './routes/aiChat';
+import supportRoutes from './routes/support';
 
 export async function buildApp() {
   const app = Fastify({ logger: true });
@@ -59,6 +61,8 @@ export async function buildApp() {
   await app.register(spendRoutes, { prefix: '/api/spend' });
   await app.register(providerRoutes, { prefix: '/api/providers' });
   await app.register(youtubeRoutes, { prefix: '/api/youtube' });
+  await app.register(aiChatRoutes, { prefix: '/api/ai-chat' });
+  await app.register(supportRoutes, { prefix: '/api/support' });
 
   return app;
 }

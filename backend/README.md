@@ -1,6 +1,14 @@
-# VEO Studio Backend — R4 YouTube Automation
+# VEO Studio Backend — R5 Personal Platform
 
 Fastify + Postgres + Redis/BullMQ. See `../docs/backend-blueprint.md` for the full design.
+
+## R5 scope (delivered)
+
+- **AI chat** (`/api/ai-chat`): per-user threads + messages. `POST /threads/:id/messages` saves the user message, runs it through the LLM provider chain (history folded into one prompt; the stub is skipped — no fabricated replies), saves the assistant reply with token estimates (chars/4, same convention as the Gemini adapter), and auto-titles the thread from the first message. Charged to the existing `ai_tokens_in`/`ai_tokens_out` quota: input reserved upfront from the estimate, over-reservation refunded, actuals reconciled to the PG ledger. No LLM key → `503 llm_not_configured`; the failed user message is rolled back so the thread stays clean.
+- **Support tickets** (`/api/support`): create/list (status filter)/view/change-status/reply/delete; replies bump `updated_at`. Backs the Support page.
+- **Provider registry admin** (`/api/providers`): `POST /` adds a row (disabled by default, priority appended — explicit opt-in before it joins a live chain), `PUT /:name` edits enabled/priority/model/cost/endpoint/config, `POST /:name/move` reorders within its capability chain, `DELETE /:name` removes the row. Routing rules = per-capability priority order + enable flags; changes apply to the next request, no restart.
+- **Frontend**: AI Chat page wired (thread list, bubbles, typing indicator, suggestion chips, honest 503 card linking to API Keys); Support page wired (status tabs, ticket detail with replies, status changer); new **Provider Registry** page (`/providers`, linked from the API Keys provider card); dashboard AI Token Usage cards now show today's real `ai_tokens` quota instead of the demo numbers.
+- Smoke-tested: chat 503 path (quota released, message rolled back), threads CRUD, tickets CRUD + status + replies, registry add/enable/move/delete. Full chat success path needs a real Gemini key (vaibhav pastes it on the API Keys page).
 
 ## R4 scope (delivered)
 

@@ -179,6 +179,42 @@ export interface SchemaMigrations {
   applied_at: Generated<Date>;
 }
 
+export interface ChatThreads {
+  id: Generated<string>;
+  user_id: string;
+  title: string;
+  created_at: Generated<Date>;
+}
+
+export interface ChatMessages {
+  id: Generated<string>;
+  thread_id: string;
+  role: string; // 'user' | 'assistant'
+  content: string;
+  tokens_in: Generated<number>;
+  tokens_out: Generated<number>;
+  provider: string | null;
+  created_at: Generated<Date>;
+}
+
+export interface SupportTickets {
+  id: Generated<string>;
+  user_id: string;
+  subject: string;
+  body: Generated<string>;
+  status: Generated<string>; // open | in_progress | waiting | resolved | closed
+  created_at: Generated<Date>;
+  updated_at: Generated<Date>;
+}
+
+export interface TicketReplies {
+  id: Generated<string>;
+  ticket_id: string;
+  user_id: string;
+  body: string;
+  created_at: Generated<Date>;
+}
+
 export interface Database {
   schema_migrations: SchemaMigrations;
   users: Users;
@@ -194,4 +230,8 @@ export interface Database {
   voices: Voices;
   youtube_analyses: YoutubeAnalyses;
   api_keys: ApiKeys;
+  chat_threads: ChatThreads;
+  chat_messages: ChatMessages;
+  support_tickets: SupportTickets;
+  ticket_replies: TicketReplies;
 }

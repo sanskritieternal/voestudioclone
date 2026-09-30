@@ -128,9 +128,9 @@
 <div class="grid grid-2 gap-4 mt-4">
 <div class="card stagger-3"><div class="card-header"><h3>AI Token Usage</h3></div>
 <div class="dash-usage-3col">
-<div class="dash-usage-card"><div class="dash-usage-count">23.9K</div><div class="dash-usage-title">Input Tokens</div></div>
-<div class="dash-usage-card"><div class="dash-usage-count">5.4K</div><div class="dash-usage-title">Output Tokens</div></div>
-<div class="dash-usage-card"><div class="dash-usage-count">29.4K</div><div class="dash-usage-title">Total Tokens</div></div>
+<div class="dash-usage-card"><div class="dash-usage-count" id="tokIn">—</div><div class="dash-usage-title">Input Tokens</div></div>
+<div class="dash-usage-card"><div class="dash-usage-count" id="tokOut">—</div><div class="dash-usage-title">Output Tokens</div></div>
+<div class="dash-usage-card"><div class="dash-usage-count" id="tokTotal">—</div><div class="dash-usage-title">Total Tokens</div></div>
 </div></div>
 
 <div class="card stagger-3"><div class="card-header"><h3>Project Activity</h3><span class="text-muted text-sm">Last 14 days</span></div>
@@ -226,5 +226,30 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
   document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
 });
+</script>
+<script>
+(function () {
+  // R5: live AI token usage (today's ai_tokens quota) instead of the demo numbers.
+  function fmt(n) {
+    n = Number(n || 0);
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+    return String(n);
+  }
+  var base = (localStorage.getItem('veo_api_base') || '').replace(/\/$/, '');
+  var tok = localStorage.getItem('veo_token') || '';
+  if (!tok) return;
+  fetch(base + '/api/auth/me', { headers: { Authorization: 'Bearer ' + tok } })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (me) {
+      if (!me || !me.quotas) return;
+      var ti = me.quotas.ai_tokens_in ? me.quotas.ai_tokens_in.used : 0;
+      var to = me.quotas.ai_tokens_out ? me.quotas.ai_tokens_out.used : 0;
+      document.getElementById('tokIn').textContent = fmt(ti);
+      document.getElementById('tokOut').textContent = fmt(to);
+      document.getElementById('tokTotal').textContent = fmt(ti + to);
+    })
+    .catch(function () {});
+})();
 </script>
 </body></html>

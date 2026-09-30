@@ -101,9 +101,15 @@
 <div class="fade-in">
 
 <div class="page-header stagger-1"><div><h1 class="page-title">Support Tickets</h1><p class="page-subtitle">We usually reply within 24 hours</p></div>
-<div class="page-actions"><button class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg> New Ticket</button></div></div>
-<div class="tab-row stagger-2"><button class="tab-btn active">All</button><button class="tab-btn">Open</button><button class="tab-btn">In Progress</button><button class="tab-btn">Waiting</button><button class="tab-btn">Resolved</button><button class="tab-btn">Closed</button></div>
-<div class="empty-state card stagger-3"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg><h3>No tickets yet</h3><p>Open a ticket and our team will help you out.</p></div>
+<div class="page-actions"><button class="btn btn-primary" id="ticketNew"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg> New Ticket</button></div></div>
+<div class="tab-row stagger-2"><button class="tab-btn active" data-status="">All</button><button class="tab-btn" data-status="open">Open</button><button class="tab-btn" data-status="in_progress">In Progress</button><button class="tab-btn" data-status="waiting">Waiting</button><button class="tab-btn" data-status="resolved">Resolved</button><button class="tab-btn" data-status="closed">Closed</button></div>
+<div id="ticketList" class="card stagger-3"><div class="card-body" id="ticketRows"></div></div>
+<div id="ticketForm" class="card stagger-3 mt-4" style="display:none"><div class="card-header"><h3>New ticket</h3></div><div class="card-body">
+<form id="newTicketForm"><div class="form-group"><label class="form-label">Subject</label><input class="form-input" name="subject" required maxlength="200"></div>
+<div class="form-group"><label class="form-label">Details</label><textarea class="form-input" name="body" rows="4"></textarea></div>
+<div class="form-actions"><button class="btn btn-primary" type="submit">Open ticket</button> <button class="btn btn-secondary" type="button" id="ticketCancel">Cancel</button></div></form>
+</div></div>
+<div id="ticketDetail" class="card stagger-3 mt-4" style="display:none"><div class="card-body" id="ticketDetailBody"></div></div>
 
 </div>
 </main>
@@ -162,5 +168,120 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
   document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
 });
+</script>
+<script src="/assets/js/yt-tools.js"></script>
+<script>
+(function () {
+  'use strict';
+  var YT = window.YTTools;
+  var status = '';
+  var rowsEl = document.getElementById('ticketRows');
+  var formCard = document.getElementById('ticketForm');
+  var detailCard = document.getElementById('ticketDetail');
+  var detailBody = document.getElementById('ticketDetailBody');
+
+  function api(path, opts) {
+    opts = opts || {};
+    opts.headers = YT.headers();
+    return fetch(YT.apiBase() + '/api/support' + path, opts).then(function (r) {
+      return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; });
+    });
+  }
+
+  function badge(st) { return '<span class="status-badge status-' + st + '">' + YT.esc(st.replace('_', ' ')) + '</span>'; }
+
+  function load() {
+    api('/tickets' + (status ? '?status=' + status : '')).then(function (res) {
+      if (!res.ok) { rowsEl.innerHTML = YT.errHtml(res.body); return; }
+      var ts = res.body.tickets || [];
+      if (!ts.length) {
+        rowsEl.innerHTML = '<div class="empty-state"><h3>No tickets yet</h3><p>Open a ticket and track it here.</p></div>';
+        return;
+      }
+      rowsEl.innerHTML = ts.map(function (t) {
+        return '<div class="ticket-row" data-id="' + t.id + '"><div class="ticket-subject"><strong>' + YT.esc(t.subject) + '</strong>' +
+          '<span>' + YT.fmtDate(t.updated_at) + ' · ' + (t.reply_count != null ? t.reply_count : '') + '</span></div>' + badge(t.status) + '</div>';
+      }).join('');
+    });
+  }
+
+  document.querySelectorAll('.tab-btn[data-status]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      status = btn.getAttribute('data-status');
+      detailCard.style.display = 'none';
+      load();
+    });
+  });
+
+  document.getElementById('ticketNew').addEventListener('click', function () {
+    detailCard.style.display = 'none';
+    formCard.style.display = formCard.style.display === 'none' ? '' : 'none';
+  });
+  document.getElementById('ticketCancel').addEventListener('click', function () { formCard.style.display = 'none'; });
+
+  document.getElementById('newTicketForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = e.target;
+    api('/tickets', { method: 'POST', body: JSON.stringify({ subject: f.subject.value, body: f.body.value }) }).then(function (res) {
+      if (!res.ok) { alert((res.body && (res.body.message || res.body.error)) || 'Failed'); return; }
+      f.reset();
+      formCard.style.display = 'none';
+      load();
+    });
+  });
+
+  rowsEl.addEventListener('click', function (e) {
+    var row = e.target.closest('.ticket-row');
+    if (!row) return;
+    var id = row.getAttribute('data-id');
+    api('/tickets/' + id).then(function (res) {
+      if (!res.ok) return;
+      var t = res.body.ticket;
+      var replies = res.body.replies || [];
+      var html = '<div class="page-header" style="margin-bottom:8px"><div><h3 style="margin:0">' + YT.esc(t.subject) + '</h3>' +
+        '<p class="text-muted">Opened ' + YT.fmtDate(t.created_at) + '</p></div>' +
+        '<div class="page-actions">' + badge(t.status) + '</div></div>' +
+        (t.body ? '<p>' + YT.esc(t.body).replace(/\n/g, '<br>') + '</p>' : '') +
+        replies.map(function (r) {
+          return '<div class="ticket-detail-reply"><p style="margin:0">' + YT.esc(r.body).replace(/\n/g, '<br>') + '</p>' +
+            '<span class="text-muted" style="font-size:.8rem">' + YT.fmtDate(r.created_at) + '</span></div>';
+        }).join('') +
+        '<form id="replyForm" class="mt-3"><div class="form-group"><label class="form-label">Add a reply</label>' +
+        '<textarea class="form-input" name="body" rows="3" required></textarea></div>' +
+        '<div class="form-actions"><button class="btn btn-primary btn-sm" type="submit">Reply</button> ' +
+        '<select class="form-input" name="status" style="width:auto;display:inline-block">' +
+        ['open', 'in_progress', 'waiting', 'resolved', 'closed'].map(function (st) {
+          return '<option value="' + st + '"' + (st === t.status ? ' selected' : '') + '>' + st.replace('_', ' ') + '</option>';
+        }).join('') + '</select> ' +
+        '<button class="btn btn-secondary btn-sm" type="button" id="ticketDelete">Delete</button></div></form>';
+      detailBody.innerHTML = html;
+      detailCard.style.display = '';
+      detailCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      document.getElementById('replyForm').addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var f = ev.target;
+        api('/tickets/' + id + '/replies', { method: 'POST', body: JSON.stringify({ body: f.body.value }) }).then(function (r2) {
+          if (!r2.ok) { alert('Reply failed'); return; }
+          if (f.status.value !== t.status) {
+            api('/tickets/' + id, { method: 'PATCH', body: JSON.stringify({ status: f.status.value }) }).then(function () { load(); });
+          }
+          row.click();
+        });
+      });
+      document.getElementById('ticketDelete').addEventListener('click', function () {
+        if (!confirm('Delete this ticket?')) return;
+        api('/tickets/' + id, { method: 'DELETE' }).then(function () {
+          detailCard.style.display = 'none';
+          load();
+        });
+      });
+    });
+  });
+
+  load();
+})();
 </script>
 </body></html>

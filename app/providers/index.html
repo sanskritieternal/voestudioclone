@@ -2,7 +2,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/png" href="../assets/img/logo.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>API Keys | VEO Studio Ai</title>
+<title>Provider Registry | VEO Studio Ai</title>
 <meta name="description" content="Your API credentials and tokens">
 <meta name="author" content="Zain Ali">
 <meta name="publisher" content="DevZea">
@@ -100,162 +100,146 @@
 <main class="main-content fade-in">
 <div class="fade-in">
 
-<div class="page-header stagger-1"><div><h1 class="page-title">API Keys</h1><p class="page-subtitle">View your API credentials and authentication tokens</p></div>
-<div class="page-actions"></div></div>
-<div class="card stagger-2"><div class="card-header"><h3>API Token</h3><span class="api-auth-badge">JWT</span></div>
-<div class="token-row"><code class="api-path">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</code>
-<button class="btn btn-secondary btn-sm" data-copy="#tokFull"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Copy</button>
-<button class="btn btn-ghost btn-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Regenerate</button></div>
-<pre id="tokFull" style="display:none;">YOUR_JWT_TOKEN</pre>
-<p class="form-hint">Keep this token secret. It grants full access to your account via the API.</p></div>
-<div class="card stagger-3 mt-4"><div class="card-header"><h3>Base URL</h3></div>
-<div class="token-row"><code class="api-path">https://veostudioai.com</code>
-<button class="btn btn-secondary btn-sm" data-copy="#baseUrl"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Copy</button></div>
-<pre id="baseUrl" style="display:none;">https://veostudioai.com</pre></div>
-<div class="card stagger-3 mt-4"><div class="card-header"><h3>Quick Start &mdash; cURL</h3></div>
-<pre class="prompt-block">curl -X POST https://veostudioai.com/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"you@example.com","password":"&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"}'</pre></div>
-<div class="card stagger-3 mt-4"><div class="card-header"><h3>Provider integrations</h3><span class="api-auth-badge">Server-side</span></div>
-<p class="form-hint" style="margin-bottom:12px;">Paste your provider API keys here. They are stored on your server and take precedence over <code>.env</code> values. Keys are never displayed back — only whether one is configured. To change routing order, models, or add providers, use the <a href="/providers">Provider Registry</a>.</p>
-<div id="provRows"></div>
-<p class="form-hint" id="provMsg" style="margin-top:10px;"></p></div>
+<div class="page-header stagger-1"><div><h1 class="page-title">Provider Registry</h1><p class="page-subtitle">Routing order, enable flags, and models for every capability chain</p></div>
+<div class="page-actions"><a class="btn btn-secondary" href="/api-keys">API Keys</a></div></div>
+
+<div class="card stagger-2"><div class="card-body">
+<p class="text-muted" style="margin:0">Chains are tried top to bottom: <strong>lower priority runs first</strong>. Disabled providers are skipped; API keys live on the <a href="/api-keys">API Keys page</a> (values are never shown here). Changes apply to the next request — no restart needed.</p>
+</div></div>
+
+<div id="provSections" class="stagger-3"></div>
+
+<div class="card stagger-4"><div class="card-header"><h3>Add provider</h3></div>
+<div class="card-body">
+<form id="provAdd" class="prov-add-form">
+<div class="form-grid">
+<div class="form-group"><label class="form-label">Name</label><input class="form-input" name="name" required minlength="2" maxlength="80" placeholder="my-llama-endpoint"></div>
+<div class="form-group"><label class="form-label">Capability</label><select class="form-input" name="capability"><option value="llm">LLM</option><option value="tts">TTS</option><option value="video">Video</option><option value="image">Image</option></select></div>
+<div class="form-group"><label class="form-label">Transport</label><select class="form-input" name="transport"><option value="self-hosted">Self-hosted</option><option value="native">Native</option><option value="fal">fal.ai</option><option value="replicate">Replicate</option><option value="together">Together</option></select></div>
+<div class="form-group"><label class="form-label">Default model</label><input class="form-input" name="default_model" placeholder="llama-3.3-70b"></div>
+<div class="form-group"><label class="form-label">Endpoint</label><input class="form-input" name="endpoint" placeholder="https://my-gpu.example.com/generate"></div>
+<div class="form-group"><label class="form-label">Cost / unit (USD)</label><input class="form-input" name="cost_per_unit" type="number" step="0.0001" min="0" placeholder="0.01"></div>
+</div>
+<div class="form-group"><label class="form-label">Config (JSON)</label><textarea class="form-input" name="config" rows="3" placeholder='{"submit_path": "/v1/generate", "api_key_env": "MY_KEY"}'></textarea></div>
+<div class="form-actions"><button class="btn btn-primary" type="submit">Add provider</button></div>
+<div id="provAddMsg" class="mt-2"></div>
+</form>
+</div></div>
 
 </div>
 </main>
+</main>
 <nav class="mobile-nav"><a class="mobile-nav-item " href="/dashboard" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg> <span>Home</span></a><a class="mobile-nav-item " href="/projects" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-open" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></svg> <span>Projects</span></a><a class="mobile-nav-item " href="/projects/new" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-plus" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg> <span>Create</span></a><a aria-current="page" class="mobile-nav-item active" href="/tools" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wrench" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"></path></svg> <span>Tools</span></a></nav>
 </div>
+<script src="/assets/js/yt-tools.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // theme toggle (real sidebar button + any [data-theme-toggle])
-  var toggles = document.querySelectorAll('.theme-toggle, [data-theme-toggle]');
-  function setTheme(t){ document.documentElement.setAttribute('data-theme', t); document.body.setAttribute('data-theme', t); try{localStorage.setItem('veo-theme', t);}catch(e){} toggles.forEach(function(el){ el.classList.toggle('on', t==='dark'); var tr = el.querySelector('.theme-toggle-track'); if(tr) tr.classList.toggle('active', t==='dark'); }); }
-  var saved = null; try{ saved = localStorage.getItem('veo-theme'); }catch(e){}
-  if (saved) setTheme(saved);
-  toggles.forEach(function(el){ el.addEventListener('click', function(){ setTheme(document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark'); }); });
-  // generic switches (Auto Prompt Refine etc.) - visual only, no theme side effects
-  document.querySelectorAll('[data-switch]').forEach(function(sw){
-    sw.addEventListener('click', function(){
-      var on = sw.getAttribute('aria-pressed') === 'true';
-      sw.setAttribute('aria-pressed', on ? 'false' : 'true');
-      sw.classList.toggle('on', !on);
+(function () {
+  'use strict';
+  var YT = window.YTTools;
+  var CAPS = [['tts', 'TTS'], ['video', 'Video'], ['image', 'Image'], ['llm', 'LLM']];
+  var TRANSPORT_LABEL = { native: 'Native', fal: 'fal.ai', replicate: 'Replicate', together: 'Together', 'self-hosted': 'Self-hosted' };
+
+  function api(path, opts) {
+    opts = opts || {};
+    opts.headers = YT.headers();
+    return fetch(YT.apiBase() + '/api/providers' + path, opts).then(function (r) {
+      return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; });
     });
-  });
-  // sidebar collapse
-  var sb = document.querySelector('.sidebar');
-  document.querySelectorAll('[data-collapse]').forEach(function(el){ el.addEventListener('click', function(){ if(sb) sb.classList.toggle('sidebar-collapsed'); document.body.classList.toggle('sidebar-is-collapsed'); }); });
-  // dropdowns
-  document.querySelectorAll('[data-dropdown]').forEach(function(btn){
-    btn.addEventListener('click', function(e){ e.stopPropagation(); var m = btn.parentElement.querySelector('.dropdown-menu'); document.querySelectorAll('.dropdown-menu.open').forEach(function(x){ if(x!==m) x.classList.remove('open'); }); if(m) m.classList.toggle('open'); });
-  });
-  document.addEventListener('click', function(){ document.querySelectorAll('.dropdown-menu.open').forEach(function(x){ x.classList.remove('open'); }); });
-  // tabs
-  document.querySelectorAll('[data-tabs]').forEach(function(wrap){
-    var btns = wrap.querySelectorAll('.tab-btn');
-    btns.forEach(function(b){ b.addEventListener('click', function(){
-      btns.forEach(function(x){ x.classList.remove('active'); }); b.classList.add('active');
-      var panes = wrap.parentElement.querySelectorAll(':scope > .tab-pane, #'+wrap.getAttribute('data-tabs')+' .tab-pane');
-      document.querySelectorAll('#'+wrap.getAttribute('data-tabs')+' .tab-pane').forEach(function(p){ p.style.display = (p.getAttribute('data-pane')===b.getAttribute('data-tab')) ? '' : 'none'; });
-    }); });
-  });
-  // accordions
-  document.querySelectorAll('[data-accordion]').forEach(function(btn){ btn.addEventListener('click', function(){ var body = btn.nextElementSibling; var open = btn.classList.toggle('open'); if(body && body.classList.contains('accordion-body')) body.style.display = open ? '' : 'none'; }); });
-  // quick actions FAB toggle
-  var qaf = document.querySelector('.qaf-fab');
-  var qafActions = document.getElementById('qafActions');
-  if (qaf && qafActions) qaf.addEventListener('click', function(){ qafActions.style.display = qafActions.style.display==='none' ? 'flex' : 'none'; });
-  // rate modal
-  var rf = document.getElementById('rateFloat');
-  if (rf) rf.addEventListener('click', function(){ var m=document.getElementById('rateModal'); if(m) m.style.display='flex'; });
-  document.querySelectorAll('[data-close]').forEach(function(b){ b.addEventListener('click', function(){ var m=document.getElementById(b.getAttribute('data-close')); if(m) m.style.display='none'; }); });
-  var aiF = document.getElementById('aiFloat');
-  if (aiF) aiF.addEventListener('click', function(){ toast('AI Assistant — demo build'); });
-  // copy buttons
-  document.querySelectorAll('[data-copy]').forEach(function(btn){ btn.addEventListener('click', function(){ var t = document.querySelector(btn.getAttribute('data-copy')); if(t){ var txt = t.innerText || t.value || ''; if(navigator.clipboard) navigator.clipboard.writeText(txt); toast('Copied to clipboard'); } }); });
-  // toast helper
-  window.toast = function(msg){ var c = document.querySelector('.toast-container'); if(!c){ c = document.createElement('div'); c.className='toast-container'; document.body.appendChild(c);} var el=document.createElement('div'); el.className='toast toast-success'; el.textContent=msg; c.appendChild(el); setTimeout(function(){ el.remove(); }, 2500); };
-  // demo: prevent real submits
-  document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
-  document.querySelectorAll('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); toast('Demo build — connect an API to enable this action.'); }); });
-});
-</script>
-<script>
-(function(){
-  function apiBase(){ return (localStorage.getItem('veo_api_base')||'').replace(/\/$/,''); }
-  function token(){ return localStorage.getItem('veo_token')||''; }
-  var PROVIDERS = [
-    { id:'elevenlabs',  name:'ElevenLabs',      desc:'Text-to-speech, SFX, voice design & cloning' },
-    { id:'gemini',      name:'Google Gemini',  desc:'Veo video, Imagen images, LLM text' },
-    { id:'fal',         name:'fal.ai',         desc:'LTX, Hunyuan and other video models via queue API' },
-    { id:'replicate',   name:'Replicate',      desc:'Open video/image models via predictions API' },
-    { id:'together',    name:'Together AI',    desc:'Open image & chat models' },
-    { id:'self-hosted', name:'Self-hosted',    desc:'Your own endpoint (configured per registry row)' },
-    { id:'youtube',     name:'YouTube Data API', desc:'Channel analyzer, video breakdown, niche finder' }
-  ];
-  var rowsEl = document.getElementById('provRows');
-  var msgEl = document.getElementById('provMsg');
-  function msg(t, ok){ msgEl.textContent = t; msgEl.style.color = ok ? 'var(--text-secondary)' : '#e5484d'; }
-  function authHeaders(){ var h = {'Content-Type':'application/json'}; var t = token(); if(t) h['Authorization'] = 'Bearer '+t; return h; }
-  function statusBadge(c){
-    var label = c.configured ? ('Configured ('+c.source+')') : 'Not configured';
-    var color = c.configured ? '#22c55e' : 'var(--text-muted)';
-    return '<span style="font-size:12px;font-weight:600;color:'+color+'">'+label+'</span>';
   }
-  function render(status){
-    var byId = {}; status.forEach(function(c){ byId[c.provider] = c; });
-    rowsEl.innerHTML = PROVIDERS.map(function(p){
-      var c = byId[p.id] || {configured:false, source:'none'};
-      return '<div class="token-row" style="margin-bottom:10px;">'
-        + '<div style="flex:1 1 200px;min-width:180px;"><div style="font-weight:600;">'+p.name+'</div>'
-        + '<div class="form-hint">'+p.desc+'</div>'
-        + '<div style="margin-top:4px;">'+statusBadge(c)+'</div></div>'
-        + '<input type="password" class="form-input" id="pk-'+p.id+'" placeholder="Paste new key to '+(c.configured?'replace':'save')+'" style="flex:2 1 260px;" autocomplete="new-password">'
-        + '<button class="btn btn-primary btn-sm" data-save="'+p.id+'">Save</button>'
-        + (c.configured ? '<button class="btn btn-ghost btn-sm" data-clear="'+p.id+'">Clear</button>' : '')
-        + '</div>';
+
+  function rowHtml(p) {
+    return '<tr data-name="' + YT.esc(p.name) + '">' +
+      '<td>' + p.priority + '</td>' +
+      '<td><strong>' + YT.esc(p.name) + '</strong></td>' +
+      '<td>' + YT.esc(TRANSPORT_LABEL[p.transport] || p.transport) + '</td>' +
+      '<td>' + YT.esc(p.default_model || '—') + '</td>' +
+      '<td>' + (p.cost_per_unit != null ? '$' + Number(p.cost_per_unit).toFixed(4) : '—') + '</td>' +
+      '<td><button type="button" class="switch' + (p.enabled ? ' on' : '') + '" data-act="toggle" aria-pressed="' + !!p.enabled + '"><span class="switch-thumb"></span></button></td>' +
+      '<td class="prov-actions">' +
+        '<button class="btn btn-secondary btn-sm" data-act="up" title="Move up">↑</button>' +
+        '<button class="btn btn-secondary btn-sm" data-act="down" title="Move down">↓</button>' +
+        '<button class="btn btn-secondary btn-sm" data-act="edit">Edit</button>' +
+        '<button class="btn btn-secondary btn-sm prov-del" data-act="del">Delete</button>' +
+      '</td></tr>';
+  }
+
+  function render(sections) {
+    var host = document.getElementById('provSections');
+    host.innerHTML = CAPS.map(function (c) {
+      var rows = sections[c[0]] || [];
+      var body = rows.length
+        ? rows.map(rowHtml).join('')
+        : '<tr><td colspan="7" class="text-muted">No providers registered for this capability.</td></tr>';
+      return '<div class="card"><div class="card-header"><h3>' + c[1] + ' chain</h3><span class="text-muted">' + rows.length + ' provider(s)</span></div>' +
+        '<div class="table-wrap"><table class="prov-table"><thead><tr><th>Priority</th><th>Name</th><th>Transport</th><th>Model</th><th>Cost</th><th>Enabled</th><th></th></tr></thead><tbody>' +
+        body + '</tbody></table></div></div>';
     }).join('');
-    rowsEl.querySelectorAll('[data-save]').forEach(function(b){
-      b.addEventListener('click', function(){
-        var id = b.getAttribute('data-save');
-        var input = document.getElementById('pk-'+id);
-        var key = (input.value||'').trim();
-        if(key.length < 8){ msg('Key looks too short — paste the full key.', false); return; }
-        b.disabled = true;
-        fetch(apiBase()+'/api/providers/'+id+'/key', { method:'PUT', headers: authHeaders(), body: JSON.stringify({key:key}) })
-          .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
-          .then(function(res){
-            b.disabled = false;
-            if(!res.ok){ msg('Save failed: '+(res.j.error||res.j.message||'error'), false); return; }
-            input.value='';
-            msg(pName(id)+' key saved. It takes effect immediately.', true);
-            load();
-          })
-          .catch(function(e){ b.disabled = false; msg('Save failed: '+e.message, false); });
+  }
+
+  function load() {
+    api('/').then(function (res) {
+      if (!res.ok) { document.getElementById('provSections').innerHTML = YT.errHtml(res.body); return; }
+      var sections = {};
+      (res.body.providers || []).forEach(function (p) {
+        (sections[p.capability] = sections[p.capability] || []).push(p);
       });
-    });
-    rowsEl.querySelectorAll('[data-clear]').forEach(function(b){
-      b.addEventListener('click', function(){
-        var id = b.getAttribute('data-clear');
-        if(!confirm('Remove the stored '+pName(id)+' key? The .env value (if any) will be used again.')) return;
-        fetch(apiBase()+'/api/providers/'+id+'/key', { method:'DELETE', headers: authHeaders() })
-          .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
-          .then(function(res){
-            if(!res.ok){ msg('Clear failed: '+(res.j.error||'error'), false); return; }
-            msg(pName(id)+' key removed.', true);
-            load();
-          })
-          .catch(function(e){ msg('Clear failed: '+e.message, false); });
-      });
+      Object.keys(sections).forEach(function (k) { sections[k].sort(function (a, b) { return a.priority - b.priority; }); });
+      render(sections);
     });
   }
-  function pName(id){ var f = PROVIDERS.filter(function(p){return p.id===id;})[0]; return f ? f.name : id; }
-  function load(){
-    if(!token()){ rowsEl.innerHTML = '<p class="form-hint">Log in to manage provider keys.</p>'; return; }
-    fetch(apiBase()+'/api/providers', { headers: authHeaders() })
-      .then(function(r){ return r.json(); })
-      .then(function(j){ render(j.credentials || []); })
-      .catch(function(e){ rowsEl.innerHTML = '<p class="form-hint">Could not reach the API. Set the API base URL below if the backend runs elsewhere.</p>'; });
-  }
+
+  document.getElementById('provSections').addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var name = btn.closest('tr').getAttribute('data-name');
+    var act = btn.getAttribute('data-act');
+    if (act === 'toggle') {
+      api('/' + encodeURIComponent(name), { method: 'PUT', body: JSON.stringify({ enabled: btn.getAttribute('aria-pressed') !== 'true' }) }).then(load);
+    } else if (act === 'up' || act === 'down') {
+      api('/' + encodeURIComponent(name) + '/move', { method: 'POST', body: JSON.stringify({ direction: act }) }).then(function (res) {
+        if (!res.ok) alert((res.body && res.body.message) || 'Cannot move further.');
+        load();
+      });
+    } else if (act === 'edit') {
+      var model = prompt('Default model (blank to keep):');
+      if (model === null) return;
+      var cost = prompt('Cost per unit in USD (blank to keep):');
+      if (cost === null) return;
+      var patch = {};
+      if (model.trim()) patch.default_model = model.trim();
+      if (cost.trim()) patch.cost_per_unit = Number(cost);
+      api('/' + encodeURIComponent(name), { method: 'PUT', body: JSON.stringify(patch) }).then(load);
+    } else if (act === 'del') {
+      if (!confirm('Delete provider "' + name + '"? This does not remove stored API keys.')) return;
+      api('/' + encodeURIComponent(name), { method: 'DELETE' }).then(load);
+    }
+  });
+
+  document.getElementById('provAdd').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = e.target;
+    var msg = document.getElementById('provAddMsg');
+    var cfg = {};
+    var cfgRaw = f.config.value.trim();
+    if (cfgRaw) {
+      try { cfg = JSON.parse(cfgRaw); }
+      catch (err) { msg.innerHTML = YT.errHtml({ error: 'bad_json', message: 'Config is not valid JSON.' }); return; }
+    }
+    var payload = {
+      name: f.name.value.trim(), capability: f.capability.value, transport: f.transport.value,
+      default_model: f.default_model.value.trim() || undefined,
+      endpoint: f.endpoint.value.trim() || undefined,
+      cost_per_unit: f.cost_per_unit.value === '' ? undefined : Number(f.cost_per_unit.value),
+      config: cfg,
+    };
+    api('/', { method: 'POST', body: JSON.stringify(payload) }).then(function (res) {
+      if (!res.ok) { msg.innerHTML = YT.errHtml(res.body); return; }
+      msg.innerHTML = '<div class="alert alert-success">Provider added (disabled by default — enable it when ready).</div>';
+      f.reset();
+      load();
+    });
+  });
+
   load();
 })();
 </script>

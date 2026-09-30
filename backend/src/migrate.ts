@@ -7,6 +7,7 @@ import * as m004 from './db/migrations/004_seed';
 import * as m005 from './db/migrations/005_r2';
 import * as m006 from './db/migrations/006_r3';
 import * as m007 from './db/migrations/007_credentials';
+import * as m008 from './db/migrations/008_r5';
 
 const MIGRATIONS: Array<{ name: string; up: (db: Kysely<any>) => Promise<void> }> = [
   { name: '001_core', up: m001.up },
@@ -16,6 +17,7 @@ const MIGRATIONS: Array<{ name: string; up: (db: Kysely<any>) => Promise<void> }
   { name: '005_r2', up: m005.up },
   { name: '006_r3', up: m006.up },
   { name: '007_credentials', up: m007.up },
+  { name: '008_r5', up: m008.up },
 ];
 
 async function migrate(): Promise<void> {
